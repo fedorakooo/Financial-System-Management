@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.infrastructure.config import settings
+from src.infrastructure.uow import UnitOfWork
 
 DATABASE_URL = settings.db.url
 
@@ -32,3 +33,15 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             raise e
         else:
             await db.commit()
+
+
+async def get_unit_of_work() -> UnitOfWork:
+    async with async_session_maker() as session:
+        uow = UnitOfWork(session)
+        try:
+            yield uow
+        except Exception as e:
+            await session.rollback()
+            raise e
+        else:
+            await session.commit()
