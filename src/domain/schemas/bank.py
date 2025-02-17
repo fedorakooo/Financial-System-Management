@@ -1,6 +1,7 @@
 from datetime import datetime
-from typing import Optional
 from pydantic import BaseModel
+
+from src.domain.utils.partial_model import partial_model
 
 
 class BankBase(BaseModel):
@@ -13,10 +14,9 @@ class BankCreate(BankBase):
     pass
 
 
-class BankUpdate(BaseModel):
-    name: Optional[str] = None
-    bic: Optional[str] = None
-    address: Optional[str] = None
+@partial_model
+class BankUpdate(BankBase):
+    pass
 
 
 class BankRead(BankBase):

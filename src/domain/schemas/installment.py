@@ -1,9 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
 from pydantic import BaseModel
 
-from src.core.enums.installment import InstallmentTermMonths, InstallmentStatus
+from src.domain.enums.installment import InstallmentTermMonths, InstallmentStatus
+from src.domain.utils.partial_model import partial_model
 
 
 class InstallmentBase(BaseModel):
@@ -18,8 +18,9 @@ class InstallmentCreate(InstallmentBase):
     pass
 
 
-class InstallmentUpdate(BaseModel):
-    status: Optional[InstallmentStatus] = None
+@partial_model
+class InstallmentUpdate(InstallmentBase):
+    pass
 
 
 class InstallmentRead(InstallmentBase):

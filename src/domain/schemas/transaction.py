@@ -2,7 +2,8 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
 
-from src.core.enums.transaction import TransactionType, TransactionStatus
+from src.domain.enums.transaction import TransactionType, TransactionStatus
+from src.domain.utils.partial_model import partial_model
 
 
 class TransactionBase(BaseModel):
@@ -17,12 +18,9 @@ class TransactionCreate(TransactionBase):
     pass
 
 
-class TransactionUpdate(BaseModel):
-    from_account_id: Optional[int] = None
-    to_account_id: Optional[int] = None
-    amount: Optional[int] = None
-    type: Optional[TransactionType] = None
-    status: Optional[TransactionStatus] = None
+@partial_model
+class TransactionUpdate(TransactionBase):
+    pass
 
 
 class TransactionRead(TransactionBase):

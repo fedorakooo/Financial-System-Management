@@ -1,8 +1,8 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
-from typing import Optional
 
-from src.core.enums.user import UserRole
+from src.domain.enums.user import UserRole
+from src.domain.utils.partial_model import partial_model
 
 
 class UserBase(BaseModel):
@@ -19,15 +19,9 @@ class UserCreate(UserBase):
     hashed_password: str
 
 
-class UserUpdate(BaseModel):
-    name: Optional[str] = None
-    passport_number: Optional[str] = None
-    phone_number: Optional[str] = None
-    email: Optional[EmailStr] = None
-    role: Optional[UserRole] = None
-    is_active: Optional[bool] = None
-    is_foreign: Optional[bool] = None
-    hashed_password: Optional[str] = None
+@partial_model
+class UserUpdate(UserBase):
+    pass
 
 
 class UserRead(UserBase):

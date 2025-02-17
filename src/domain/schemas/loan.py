@@ -1,9 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
 from pydantic import BaseModel
 
-from src.core.enums.loan import LoanTermMonths, LoanStatus
+from src.domain.enums.loan import LoanTermMonths, LoanStatus
+from src.domain.utils.partial_model import partial_model
 
 
 class LoanBase(BaseModel):
@@ -18,11 +18,9 @@ class LoanCreate(LoanBase):
     pass
 
 
-class LoanUpdate(BaseModel):
-    amount: Optional[int] = None
-    term_months: Optional[LoanTermMonths] = None
-    interest_rate: Optional[Decimal] = None
-    status: Optional[LoanStatus] = None
+@partial_model
+class LoanUpdate(LoanBase):
+    pass
 
 
 class LoanRead(LoanBase):

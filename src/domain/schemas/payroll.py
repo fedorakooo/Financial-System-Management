@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import Optional
 from pydantic import BaseModel
 
-from src.core.enums.payroll import PayrollRequestStatus
+from src.domain.enums.payroll import PayrollRequestStatus
+from src.domain.utils.partial_model import partial_model
 
 
 class PayrollRequestBase(BaseModel):
@@ -14,8 +14,9 @@ class PayrollRequestCreate(PayrollRequestBase):
     pass
 
 
-class PayrollRequestUpdate(BaseModel):
-    status: Optional[PayrollRequestStatus] = None
+@partial_model
+class PayrollRequestUpdate(PayrollRequestBase):
+    pass
 
 
 class PayrollRequestRead(PayrollRequestBase):

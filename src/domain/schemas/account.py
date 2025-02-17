@@ -3,7 +3,8 @@ from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel
 
-from src.core.enums.account import AccountStatus
+from src.domain.enums.account import AccountStatus
+from src.domain.utils.partial_model import partial_model
 
 
 class AccountBase(BaseModel):
@@ -19,9 +20,9 @@ class AccountCreate(AccountBase):
     bank_id: int
 
 
-class AccountUpdate(BaseModel):
-    balance: Optional[Decimal] = None
-    status: Optional[AccountStatus] = None
+@partial_model
+class AccountUpdate(AccountBase):
+    pass
 
 
 class AccountRead(AccountBase):

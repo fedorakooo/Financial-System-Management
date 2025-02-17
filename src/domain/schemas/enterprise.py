@@ -2,7 +2,8 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
-from src.core.enums.enterprise import EnterpriseType
+from src.domain.enums.enterprise import EnterpriseType
+from src.domain.utils.partial_model import partial_model
 
 
 class EnterpriseBase(BaseModel):
@@ -17,12 +18,9 @@ class EnterpriseCreate(EnterpriseBase):
     pass
 
 
-class EnterpriseUpdate(BaseModel):
-    name: Optional[str] = None
-    type: Optional[EnterpriseType] = None
-    unp: Optional[str] = None
-    bank_id: Optional[int] = None
-    address: Optional[str] = None
+@partial_model
+class EnterpriseUpdate(EnterpriseBase):
+    pass
 
 
 class EnterpriseRead(EnterpriseBase):
