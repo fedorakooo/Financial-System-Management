@@ -11,7 +11,7 @@ class DbSettings(BaseModel):
     user: str = os.environ.get("DB_USER")
     password: str = os.environ.get("DB_PASS")
 
-    url: str = f"postgresql+asyncpg://{user}:{password}@{host}/{name}"
+    url: str = f"postgres://{user}:{password}@{host}/{name}"
     echo: bool = True
 
 
