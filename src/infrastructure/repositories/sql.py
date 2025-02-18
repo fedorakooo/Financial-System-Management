@@ -1,17 +1,17 @@
 from abc import abstractmethod, ABC
 from typing import Optional, List, TypeVar, Generic, Type
 from asyncpg.exceptions import UniqueViolationError
+from pydantic import BaseModel
 
 from src.domain.abstractions.repository import AbstractRepository
 from src.infrastructure.database import DatabaseConnection
-from src.infrastructure.models.base import BaseORM
 from src.domain.exceptions.repository import (
     UniqueConstraintError,
     NoFieldsToUpdateError,
     NotFoundError
 )
 
-Item = TypeVar("Item", bound=BaseORM)
+Item = TypeVar("Item", bound=BaseModel)
 
 
 class SQLRepository(Generic[Item], AbstractRepository, ABC):
