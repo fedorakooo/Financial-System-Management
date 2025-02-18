@@ -20,6 +20,8 @@ class BankRepository(SQLRepository[BankBase]):
             );
         """
 
+        create_index = "CREATE INDEX IF NOT EXISTS idx_banks_bic ON banks(bic);"
+
         create_trigger = """
             CREATE OR REPLACE FUNCTION update_updated_at_column()
             RETURNS TRIGGER AS $$
@@ -37,4 +39,5 @@ class BankRepository(SQLRepository[BankBase]):
 
         async with DatabaseConnection() as conn:
             await conn.execute(create_table)
+            await conn.execute(create_index)
             await conn.execute(create_trigger)
