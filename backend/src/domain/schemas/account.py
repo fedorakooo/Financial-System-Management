@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from src.domain.enums.account import AccountStatus
-from src.domain.utils.model import ModelUtils
+from src.domain.utils.models import ModelUtils
 
 
 class AccountBase(BaseModel):

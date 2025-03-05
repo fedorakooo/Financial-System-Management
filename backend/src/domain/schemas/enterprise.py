@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from src.domain.enums.enterprise import EnterpriseType
-from src.domain.utils.model import ModelUtils
+from src.domain.utils.models import ModelUtils
 
 
 class EnterpriseBase(BaseModel):

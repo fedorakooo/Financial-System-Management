@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel
 
-from src.domain.utils.model import ModelUtils
+from src.domain.utils.models import ModelUtils
 
 
 class BankBase(BaseModel):
