@@ -3,7 +3,7 @@ from typing import List, Optional
 from src.domain.abstractions.repositories.users import AbstractUserRepository
 from src.domain.abstractions.uow import AbstractUnitOfWork
 from src.domain.schemas.user import UserCreate, UserRead, UserUpdate
-from src.services.auth.password_handler import PasswordHandler
+from src.domain.utils.password import PasswordHandler
 
 
 class UserService:
