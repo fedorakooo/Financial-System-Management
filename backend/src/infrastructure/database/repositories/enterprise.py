@@ -1,12 +1,12 @@
 from typing import List
 from asyncpg.exceptions import UniqueViolationError
 
-from src.domain.abstractions.repositories.enterprises import AbstractEnterpriseRepository
+from src.domain.abstractions.database.repositories.enterprises import AbstractEnterpriseRepository
 from src.domain.exceptions.repository import NotFoundError, NoFieldsToUpdateError
 from src.domain.schemas.enterprise import EnterpriseRead, EnterpriseCreate, EnterpriseUpdate
 from src.domain.utils.enums import EnumUtils
 from src.domain.utils.fields import FieldUtils
-from src.infrastructure.database.database import DatabaseConnection
+from src.infrastructure.database.connection import DatabaseConnection
 from src.infrastructure.database.errors.error_handler import ErrorHandler
 
 

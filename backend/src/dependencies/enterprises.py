@@ -1,22 +1,23 @@
 from fastapi import Depends
 
 from src.dependencies.dependencies import Dependencies
-from src.infrastructure.database.database import DatabaseConnection
+from src.domain.abstractions.database.connection import AbstractDatabaseConnection
+from src.domain.abstractions.database.repositories.enterprises import AbstractEnterpriseRepository
+from src.domain.abstractions.database.uow import AbstractUnitOfWork
 from src.infrastructure.database.repositories.enterprise import EnterpriseRepository
-from src.infrastructure.database.uow import UnitOfWork
 from src.services.enterprises.enterprise import EnterpriseService
 
 
 class EnterpriseDependencies:
     @staticmethod
     def get_enterprise_repository(
-            db_connection: DatabaseConnection = Depends(Dependencies.get_database_connection)
-    ) -> EnterpriseRepository:
+            db_connection: AbstractDatabaseConnection = Depends(Dependencies.get_database_connection)
+    ) -> AbstractEnterpriseRepository:
         return EnterpriseRepository(db_connection)
 
     @staticmethod
     def get_enterprise_service(
-            repository: EnterpriseRepository = Depends(get_enterprise_repository),
-            uow: UnitOfWork = Depends(Dependencies.get_unit_of_work)
+            repository: AbstractEnterpriseRepository = Depends(get_enterprise_repository),
+            uow: AbstractUnitOfWork = Depends(Dependencies.get_unit_of_work)
     ) -> EnterpriseService:
         return EnterpriseService(repository, uow)

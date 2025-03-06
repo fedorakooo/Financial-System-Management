@@ -1,12 +1,12 @@
 from typing import List
 from asyncpg.exceptions import UniqueViolationError
 
-from src.domain.abstractions.repositories.banks import AbstractBankRepository
+from src.domain.abstractions.database.repositories.banks import AbstractBankRepository
 from src.domain.exceptions.repository import NotFoundError, NoFieldsToUpdateError
 from src.domain.schemas.bank import BankRead, BankUpdate, BankCreate
 from src.domain.utils.enums import EnumUtils
 from src.domain.utils.fields import FieldUtils
-from src.infrastructure.database.database import DatabaseConnection
+from src.infrastructure.database.connection import DatabaseConnection
 from src.infrastructure.database.errors.error_handler import ErrorHandler
 
 

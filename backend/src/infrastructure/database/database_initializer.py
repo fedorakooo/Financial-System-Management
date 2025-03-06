@@ -1,4 +1,4 @@
-from src.infrastructure.database.database import DatabaseConnection
+from src.infrastructure.database.connection import DatabaseConnection
 
 
 class DatabaseInitializer:

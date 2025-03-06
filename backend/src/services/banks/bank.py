@@ -1,8 +1,8 @@
 from typing import List
 
-from src.domain.abstractions.repositories.banks import AbstractBankRepository
+from src.domain.abstractions.database.repositories.banks import AbstractBankRepository
 from src.domain.schemas.bank import BankCreate, BankRead, BankUpdate
-from src.domain.abstractions.uow import AbstractUnitOfWork
+from src.domain.abstractions.database.uow import AbstractUnitOfWork
 
 
 class BankService:

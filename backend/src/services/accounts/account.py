@@ -1,15 +1,20 @@
 from typing import List
 
-from src.domain.abstractions.repositories.accounts import AbstractAccountRepository
+from src.domain.abstractions.logger.logger import AbstractLogger
+from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.domain.exceptions.forbidden import ForbiddenError
 from src.domain.schemas.account import AccountCreate, AccountRead, AccountCreateRequest
-from src.domain.abstractions.uow import AbstractUnitOfWork
+from src.domain.abstractions.database.uow import AbstractUnitOfWork
 
 
 class AccountService:
     def __init__(self, repository: AbstractAccountRepository, uow: AbstractUnitOfWork):
         self.uow = uow
         self.repository = repository
+
+    async def get_accounts_by_user_id(self, user_id: int) -> List[AccountRead]:
+        accounts = await self.repository.get_accounts_by_user_id(user_id)
+        return accounts
 
     async def create_account(
             self,
@@ -23,10 +28,6 @@ class AccountService:
             created_account = await self.repository.create_account(account_create)
 
         return created_account
-
-    async def get_accounts_by_user_id(self, user_id: int) -> List[AccountRead]:
-        accounts = await self.repository.get_accounts_by_user_id(user_id)
-        return accounts
 
     async def delete_account_by_id(self, account_id: int, user_id: int) -> None:
         async with self.uow as uow:

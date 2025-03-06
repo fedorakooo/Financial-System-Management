@@ -1,8 +1,8 @@
 from typing import Optional
 import asyncpg
 
-from src.domain.abstractions.uow import AbstractUnitOfWork
-from src.infrastructure.database.database import DATABASE_URL
+from src.domain.abstractions.database.uow import AbstractUnitOfWork
+from src.infrastructure.database.connection import DATABASE_URL
 
 
 class UnitOfWork(AbstractUnitOfWork):

@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from src.domain.abstractions.repositories.users import AbstractUserRepository
-from src.domain.abstractions.uow import AbstractUnitOfWork
+from src.domain.abstractions.database.repositories.users import AbstractUserRepository
+from src.domain.abstractions.database.uow import AbstractUnitOfWork
 from src.domain.schemas.user import UserCreate, UserRead, UserUpdate
 from src.domain.utils.password import PasswordHandler
 

@@ -1,7 +1,7 @@
 from typing import List
 
-from src.domain.abstractions.repositories.enterprises import AbstractEnterpriseRepository
-from src.domain.abstractions.uow import AbstractUnitOfWork
+from src.domain.abstractions.database.repositories.enterprises import AbstractEnterpriseRepository
+from src.domain.abstractions.database.uow import AbstractUnitOfWork
 from src.domain.schemas.enterprise import EnterpriseUpdate, EnterpriseRead, EnterpriseCreate
 
 

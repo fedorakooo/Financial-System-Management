@@ -1,11 +1,11 @@
 from typing import List
 from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 
-from src.domain.abstractions.repositories.accounts import AbstractAccountRepository
+from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.domain.exceptions.repository import NotFoundError
 from src.domain.schemas.account import AccountRead, AccountCreate
 from src.domain.utils.enums import EnumUtils
-from src.infrastructure.database.database import DatabaseConnection
+from src.infrastructure.database.connection import DatabaseConnection
 from src.infrastructure.database.errors.error_handler import ErrorHandler
 
 
