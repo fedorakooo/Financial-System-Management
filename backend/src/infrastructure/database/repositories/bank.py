@@ -1,18 +1,18 @@
 from typing import List
 from asyncpg.exceptions import UniqueViolationError
 
+from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 from src.domain.abstractions.database.repositories.banks import AbstractBankRepository
 from src.domain.exceptions.repository import NotFoundError, NoFieldsToUpdateError
 from src.domain.schemas.bank import BankRead, BankUpdate, BankCreate
 from src.domain.utils.enums import EnumUtils
 from src.domain.utils.fields import FieldUtils
-from src.infrastructure.database.connection import DatabaseConnection
 from src.infrastructure.database.errors.error_handler import ErrorHandler
 
 
 class BankRepository(AbstractBankRepository):
-    def __init__(self, db_connection: DatabaseConnection):
-        self.db_connection: DatabaseConnection = db_connection
+    def __init__(self, db_connection: AbstractDatabaseConnection):
+        self.db_connection: AbstractDatabaseConnection = db_connection
 
     async def get_bank_by_id(self, bank_id: int) -> BankRead:
         stmt = "SELECT * FROM banks WHERE id = $1"

@@ -1,18 +1,18 @@
 from typing import List
 from asyncpg.exceptions import UniqueViolationError
 
+from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 from src.domain.abstractions.database.repositories.enterprises import AbstractEnterpriseRepository
 from src.domain.exceptions.repository import NotFoundError, NoFieldsToUpdateError
 from src.domain.schemas.enterprise import EnterpriseRead, EnterpriseCreate, EnterpriseUpdate
 from src.domain.utils.enums import EnumUtils
 from src.domain.utils.fields import FieldUtils
-from src.infrastructure.database.connection import DatabaseConnection
 from src.infrastructure.database.errors.error_handler import ErrorHandler
 
 
 class EnterpriseRepository(AbstractEnterpriseRepository):
-    def __init__(self, db_connection: DatabaseConnection):
-        self.db_connection: DatabaseConnection = db_connection
+    def __init__(self, db_connection: AbstractDatabaseConnection):
+        self.db_connection: AbstractDatabaseConnection = db_connection
 
     async def get_enterprise_by_id(self, enterprise_id) -> EnterpriseRead:
         stmt = "SELECT * FROM enterprises where id = $1"

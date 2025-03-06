@@ -1,17 +1,17 @@
 from typing import List
 from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 
+from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.domain.exceptions.repository import NotFoundError
 from src.domain.schemas.account import AccountRead, AccountCreate
 from src.domain.utils.enums import EnumUtils
-from src.infrastructure.database.connection import DatabaseConnection
 from src.infrastructure.database.errors.error_handler import ErrorHandler
 
 
 class AccountRepository(AbstractAccountRepository):
-    def __init__(self, db_connection: DatabaseConnection):
-        self.db_connection: DatabaseConnection = db_connection
+    def __init__(self, db_connection: AbstractDatabaseConnection):
+        self.db_connection: AbstractDatabaseConnection = db_connection
 
     async def get_account_by_id(self, account_id) -> AccountRead:
         stmt = "SELECT * FROM accounts WHERE id = $1"

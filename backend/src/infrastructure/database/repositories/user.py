@@ -1,6 +1,7 @@
 from typing import List
 from asyncpg.exceptions import UniqueViolationError
 
+from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 from src.domain.abstractions.database.repositories.users import AbstractUserRepository
 from src.domain.exceptions.repository import NoFieldsToUpdateError, NotFoundError
 from src.domain.schemas.user import UserRead, UserCreate, UserUpdate
@@ -11,8 +12,8 @@ from src.infrastructure.database.errors.error_handler import ErrorHandler
 
 
 class UserRepository(AbstractUserRepository):
-    def __init__(self, db_connection: DatabaseConnection):
-        self.db_connection: DatabaseConnection = db_connection
+    def __init__(self, db_connection: AbstractDatabaseConnection):
+        self.db_connection: AbstractDatabaseConnection = db_connection
 
     async def get_user_by_id(self, user_id: int) -> UserRead:
         stmt = "SELECT * FROM users WHERE id = $1"
