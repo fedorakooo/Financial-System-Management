@@ -1,9 +1,10 @@
+from decimal import Decimal
 from typing import List
 from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 
 from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
-from src.domain.exceptions.repository import NotFoundError
+from src.domain.exceptions.repository import NotFoundError, InsufficientFundsError
 from src.domain.schemas.account import AccountRead, AccountCreate
 from src.domain.utils.enums import EnumUtils
 from src.infrastructure.database.errors.error_handler import ErrorHandler
@@ -17,7 +18,7 @@ class AccountRepository(AbstractAccountRepository):
         stmt = "SELECT * FROM accounts WHERE id = $1"
 
         async with self.db_connection as conn:
-            row = await conn.fetchval(stmt, account_id)
+            row = await conn.fetchrow(stmt, account_id)
 
         if row:
             return AccountRead(**dict(row))
@@ -47,6 +48,21 @@ class AccountRepository(AbstractAccountRepository):
             raise ErrorHandler.handle_unique_violation("Account", e, account_create)
         except ForeignKeyViolationError as e:
             raise ErrorHandler.handle_unique_violation("Account", e, account_create)
+
+        return AccountRead(**dict(row))
+
+    async def update_account_balance(self, account_id: int, amount: Decimal) -> AccountRead:
+        account: AccountRead = await self.get_account_by_id(account_id)
+
+        new_balance = account.balance + amount
+
+        if new_balance < 0:
+            raise InsufficientFundsError(account_id)
+
+        stmt = "UPDATE accounts SET balance = $2 WHERE id = $1 RETURNING *"
+
+        async with self.db_connection as conn:
+            row = await conn.fetchrow(stmt, account_id, new_balance)
 
         return AccountRead(**dict(row))
 
