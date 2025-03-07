@@ -15,7 +15,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
     404: {"description": "User not found"},
     500: {"description": "Unexpected server error"}
 })
-async def get_user(
+async def get_user_by_id(
         user_id: int,
         user_service: UserService = Depends(UserDependencies.get_user_service),
         log_service: LogService = Depends(LogDependencies.get_log_service)
@@ -109,7 +109,7 @@ async def delete_user_by_id(
         user_service: UserService = Depends(UserDependencies.get_user_service),
         log_service: LogService = Depends(LogDependencies.get_log_service)
 ):
-    log_service.info(f"Updating user with ID {user_id}")
+    log_service.info(f"Deleting user with ID {user_id}")
     try:
         await user_service.delete_user_by_id(user_id)
         log_service.info(f"User with ID {user_id} deleted successfully")
