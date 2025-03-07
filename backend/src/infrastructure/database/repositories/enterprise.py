@@ -20,7 +20,10 @@ class EnterpriseRepository(AbstractEnterpriseRepository):
         async with self.db_connection as conn:
             row = await conn.fetchrow(stmt, enterprise_id)
 
-        return EnterpriseRead(**dict(row))
+        if row:
+            return EnterpriseRead(**dict(row))
+
+        raise NotFoundError("Enterprise", "id", enterprise_id)
 
     async def get_enterprises(self) -> List[EnterpriseRead]:
         stmt = "SELECT * FROM enterprises"
