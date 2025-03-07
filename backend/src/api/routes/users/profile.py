@@ -21,7 +21,7 @@ async def get_profile(
         user: UserRead = Depends(AuthDependencies.get_current_active_auth_user),
         log_service: AbstractLogger = Depends(LogDependencies.get_log_service)
 ) -> UserRead:
-    log_service.info(f"Fetching profile for user_id = {user.id}")
+    log_service.info(f"Successfully fetched profile for user_id = {user.id}")
     return user
 
 
