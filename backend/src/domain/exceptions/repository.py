@@ -48,3 +48,15 @@ class ForeignKeyError(RepositoryError):
         super().__init__(
             f"Foreign key violation: {entity}.{field} = {value} does not exist in {referenced_table}."
         )
+
+
+class InsufficientFundsError(RepositoryError):
+    """Exception raised when there are insufficient funds in the account."""
+
+    def __init__(self, message="Insufficient funds", account_id: int = None):
+        self.message = message
+        self.account_id = account_id
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f"Account {self.account_id}: {self.message}" if self.account_id else self.message

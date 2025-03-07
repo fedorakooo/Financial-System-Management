@@ -7,6 +7,7 @@ from src.api.routes.users.users import router as users_router
 from src.api.routes.users.profile import router as profile_router
 from src.api.routes.enterprises.enterprises import router as enterprises_router
 from src.api.routes.accounts.accounts import router as accounts_router
+from src.api.routes.additions.addition import router as additions_router
 
 router = APIRouter()
 
@@ -17,3 +18,4 @@ router.include_router(users_router)
 router.include_router(profile_router)
 router.include_router(enterprises_router)
 router.include_router(accounts_router)
+router.include_router(additions_router)
