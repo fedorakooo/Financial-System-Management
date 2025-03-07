@@ -63,7 +63,7 @@ async def get_banks(
 
 
 @router.post("/", response_model=BankRead, responses={
-    409: {"description": "Bank with this name already exists"},
+    409: {"description": "A bank with these details already exists"},
     500: {"description": "Unexpected server error"}
 })
 async def create_bank(
@@ -77,7 +77,7 @@ async def create_bank(
         log_service.info(f"Bank with name {created_bank.name} and ID {created_bank.id} successfully created")
     except UniqueConstraintError as e:
         log_service.error(
-            f"Unique constraint violation while creating bank with name {bank_create.name}: {str(e)}"
+            f"Unique constraint violation while creating the bank with name {bank_create.name}: {str(e)}"
         )
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
