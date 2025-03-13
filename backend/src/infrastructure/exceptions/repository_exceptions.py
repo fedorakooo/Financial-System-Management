@@ -3,18 +3,15 @@ from inflection import tableize
 
 
 class RepositoryError(Exception):
-    """Base exception for repository errors."""
+    """Base exception for repository handlers."""
     pass
 
 
 class NotFoundError(RepositoryError):
     """Exception raised when a record is not found."""
 
-    def __init__(self, entity: str, field: str, value: Any):
-        self.entity = entity
-        self.field = field
-        self.value = value
-        super().__init__(f"{entity} with {field} = {value} not found.")
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class UniqueConstraintError(RepositoryError):
@@ -48,15 +45,3 @@ class ForeignKeyError(RepositoryError):
         super().__init__(
             f"Foreign key violation: {entity}.{field} = {value} does not exist in {referenced_table}."
         )
-
-
-class InsufficientFundsError(RepositoryError):
-    """Exception raised when there are insufficient funds in the account."""
-
-    def __init__(self, message="Insufficient funds", account_id: int = None):
-        self.message = message
-        self.account_id = account_id
-        super().__init__(self.message)
-
-    def __str__(self):
-        return f"Account {self.account_id}: {self.message}" if self.account_id else self.message
