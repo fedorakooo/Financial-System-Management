@@ -25,3 +25,11 @@ class TokenDecodeError(JWTError):
 class TokenCreationError(JWTError):
     """Exception raised when creating a JWT token fails."""
     pass
+
+
+class InvalidLoginError(Exception):
+    """Exception raised for invalid login attempts (wrong phone number or password)."""
+
+    def __init__(self, message: str = "Invalid phone number or password"):
+        super().__init__(message)
+
