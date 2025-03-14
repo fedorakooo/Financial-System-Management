@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+from src.config import settings
+
 
 class AbstractDatabaseConnection(ABC):
     """Abstract class for managing a database connection."""
@@ -13,6 +15,12 @@ class AbstractDatabaseConnection(ABC):
     @abstractmethod
     async def close(self) -> None:
         """Close the database connection."""
+        pass
+
+    @property
+    @abstractmethod
+    def connection(self) -> Any:
+        """Get the current database connection instance."""
         pass
 
     @abstractmethod
