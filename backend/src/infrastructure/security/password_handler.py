@@ -1,16 +1,16 @@
 import bcrypt
 
+from src.domain.abstractions.security.password_handler import AbstractPasswordHandler
 
-class PasswordHandler:
-    @staticmethod
-    def hash_password(password: str) -> str:
+
+class PasswordHandler(AbstractPasswordHandler):
+    def hash_password(self, password: str) -> str:
         """Hashes password using bcrypt."""
 
         salt = bcrypt.gensalt()
         return bcrypt.hashpw(password.encode(), salt).decode('utf-8')
 
-    @staticmethod
-    def validate_password(password: str, hashed_password: str) -> bool:
+    def validate_password(self, password: str, hashed_password: str) -> bool:
         """Checks if the password you entered matches the hash."""
 
         return bcrypt.checkpw(password.encode(), hashed_password.encode())
