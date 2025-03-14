@@ -1,21 +1,23 @@
-from src.infrastructure.database.connection import DatabaseConnection
-
+from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 
 class DatabaseInitializer:
-    @classmethod
-    async def create_all_tables(cls) -> None:
-        """Method to call the creation of all tables"""
-        await cls.create_banks_table()
-        await cls.create_users_table()
-        await cls.create_enterprise_table()
-        await cls.create_accounts_table()
-        await cls.create_additions_table()
+    """Class responsible for initializing the database by creating all necessary tables and database objects (e.g., enums, triggers)."""
 
-    @classmethod
-    async def create_banks_table(cls) -> None:
+    def __init__(self, db_connection: AbstractDatabaseConnection):
+        self.db_connection = db_connection
+
+    async def create_all_tables(self) -> None:
+        """Method to call the creation of all tables"""
+        await self.create_banks_table()
+        await self.create_users_table()
+        await self.create_enterprise_table()
+        await self.create_accounts_table()
+        await self.create_additions_table()
+
+    async def create_banks_table(self) -> None:
         create_table = """
             CREATE TABLE IF NOT EXISTS banks (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                 name VARCHAR(150) NOT NULL,
                 bic VARCHAR(32) NOT NULL UNIQUE,
                 address VARCHAR(255) NOT NULL,
@@ -48,14 +50,13 @@ class DatabaseInitializer:
             END $$;
         """
 
-        async with DatabaseConnection() as conn:
+        async with self.db_connection as conn:
             await conn.execute(create_table)
             await conn.execute(create_index)
             await conn.execute(create_function)
             await conn.execute(create_trigger)
 
-    @classmethod
-    async def create_users_table(cls) -> None:
+    async def create_users_table(self) -> None:
         create_enum_role = """
             DO $$ 
             BEGIN
@@ -67,7 +68,7 @@ class DatabaseInitializer:
 
         create_table = """
             CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                 name VARCHAR(150) NOT NULL,
                 passport_number VARCHAR(20) NOT NULL UNIQUE,
                 phone_number VARCHAR(20) NOT NULL UNIQUE,
@@ -103,14 +104,13 @@ class DatabaseInitializer:
             END $$;
         """
 
-        async with DatabaseConnection() as conn:
+        async with self.db_connection as conn:
             await conn.execute(create_enum_role)
             await conn.execute(create_table)
             await conn.execute(create_function)
             await conn.execute(create_trigger)
 
-    @classmethod
-    async def create_enterprise_table(cls) -> None:
+    async def create_enterprise_table(self) -> None:
         create_enum_type = """
             DO $$   
             BEGIN
@@ -122,7 +122,7 @@ class DatabaseInitializer:
 
         create_table = """
             CREATE TABLE IF NOT EXISTS enterprises (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                 name VARCHAR(150) NOT NULL,
                 type enterprise_type NOT NULL,
                 unp VARCHAR(64) NOT NULL UNIQUE,
@@ -155,19 +155,18 @@ class DatabaseInitializer:
             END $$;
         """
 
-        async with DatabaseConnection() as conn:
+        async with self.db_connection as conn:
             await conn.execute(create_enum_type)
             await conn.execute(create_table)
             await conn.execute(create_function)
             await conn.execute(create_trigger)
 
-    @classmethod
-    async def create_accounts_table(cls) -> None:
+    async def create_accounts_table(self) -> None:
         create_enum_status = """
             DO $$ 
             BEGIN
                 IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account_status') THEN
-                    CREATE TYPE account_status AS ENUM ('ACTIVE', 'BLOCKED', 'FROZEN');
+                    CREATE TYPE account_status AS ENUM ('ACTIVE', 'BLOCKED', 'FROZEN', 'ON_CONSIDERATION');
                 END IF;
             END $$;
         """
@@ -176,12 +175,11 @@ class DatabaseInitializer:
             CREATE TABLE IF NOT EXISTS accounts (
                 id SERIAL PRIMARY KEY,
                 user_id INTEGER NOT NULL REFERENCES users(id),
-                enterprise_id INTEGER REFERENCES enterprises(id),
                 bank_id INTEGER NOT NULL REFERENCES banks(id),
-                balance DECIMAL(30,2) NOT NULL CHECK (balance > 0),
-                status account_status NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+                balance DECIMAL(30,2) NOT NULL CHECK (balance >= 0) DEFAULT 0,
+                status account_status NOT NULL DEFAULT 'ON_CONSIDERATION',
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
         """
 
@@ -207,14 +205,13 @@ class DatabaseInitializer:
             END $$;
         """
 
-        async with DatabaseConnection() as conn:
+        async with self.db_connection as conn:
             await conn.execute(create_enum_status)
             await conn.execute(create_table)
             await conn.execute(create_function)
             await conn.execute(create_trigger)
 
-    @classmethod
-    async def create_additions_table(cls) -> None:
+    async def create_additions_table(self) -> None:
         create_enum_source = """
             DO $$ 
             BEGIN
@@ -244,7 +241,7 @@ class DatabaseInitializer:
             );
         """
 
-        async with DatabaseConnection() as conn:
+        async with self.db_connection as conn:
             await conn.execute(create_enum_source)
             await conn.execute(create_enum_status)
             await conn.execute(create_table)
