@@ -3,72 +3,69 @@ from asyncpg.exceptions import UniqueViolationError
 
 from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 from src.domain.abstractions.database.repositories.banks import AbstractBankRepository
-from src.domain.exceptions.repository import NotFoundError, NoFieldsToUpdateError
-from src.domain.schemas.bank import BankRead, BankUpdate, BankCreate
-from src.domain.utils.enums import EnumUtils
-from src.domain.utils.fields import FieldUtils
-from src.infrastructure.database.errors.error_handler import ErrorHandler
+from src.domain.entities.bank import Bank
+from src.infrastructure.exceptions.repository_exceptions import NotFoundError, NoFieldsToUpdateError
+from src.infrastructure.database.mappers.bank import BankDatabaseMapper
+from src.infrastructure.database.handlers.error_handler import ErrorHandler
 
 
 class BankRepository(AbstractBankRepository):
     def __init__(self, db_connection: AbstractDatabaseConnection):
         self.db_connection: AbstractDatabaseConnection = db_connection
 
-    async def get_bank_by_id(self, bank_id: int) -> BankRead:
+    async def get_bank_by_id(self, bank_id: int) -> Bank:
         stmt = "SELECT * FROM banks WHERE id = $1"
 
         async with self.db_connection as conn:
             row = await conn.fetchrow(stmt, bank_id)
 
         if row is None:
-            raise NotFoundError("Bank", "id", bank_id)
+            raise NotFoundError(f"Bank with id = {bank_id} not found")
 
-        return BankRead(**dict(row))
+        return BankDatabaseMapper.from_db_row(row)
 
-    async def get_banks(self) -> List[BankRead]:
+    async def get_banks(self) -> List[Bank]:
         stmt = "SELECT * FROM banks"
 
         async with self.db_connection as conn:
             rows = await conn.fetch(stmt)
 
-        return [BankRead(**dict(row)) for row in rows] if rows else []
+            return [BankDatabaseMapper.from_db_row(row) for row in rows] if rows else []
 
-    async def create_bank(self, bank_create: BankCreate) -> BankRead:
-        bank_dict = EnumUtils.convert_enums_to_values(bank_create.dict())
-        columns = ', '.join(bank_dict.keys())
-        placeholders = ', '.join([f"${i + 1}" for i in range(len(bank_dict))])
-        values = tuple(bank_dict.values())
+    async def create_bank(self, bank_create: Bank) -> Bank:
+        bank_create_row = BankDatabaseMapper.to_db_row(bank_create)
+
+        columns = ', '.join(bank_create_row.keys())
+        placeholders = ', '.join([f"${i + 1}" for i in range(len(bank_create_row))])
+        values = tuple(bank_create_row.values())
 
         stmt = f"INSERT INTO banks ({columns}) VALUES ({placeholders}) RETURNING *"
 
         try:
             async with self.db_connection as conn:
                 row = await conn.fetchrow(stmt, *values)
-        except UniqueViolationError as e:
-            raise ErrorHandler.handle_unique_violation("Bank", e, bank_create)
+        except UniqueViolationError as exc:
+            raise ErrorHandler.handle_unique_violation("Bank", exc, bank_create)
 
-        return BankRead(**dict(row))
+        return BankDatabaseMapper.from_db_row(row)
 
-    async def update_bank_by_id(self, bank_id: int, bank_update: BankUpdate) -> BankRead:
-        updated_fields = FieldUtils.get_updated_fields(dict(bank_update))
+    async def update_bank_by_id(self, bank_id: int, bank_update: Bank) -> Bank:
+        bank_update_row = BankDatabaseMapper.to_db_row(bank_update)
 
-        if not updated_fields:
-            raise NoFieldsToUpdateError()
-
-        columns = ', '.join([f"{key} = ${i + 1}" for i, key in enumerate(updated_fields.keys())])
-        values = tuple(updated_fields.values()) + (bank_id,)
+        columns = ', '.join([f"{key} = ${i + 1}" for i, key in enumerate(bank_update_row.keys())])
+        values = tuple(bank_update_row.values()) + (bank_id,)
         stmt = f"UPDATE banks SET {columns} WHERE id = ${len(values)} RETURNING *"
 
         try:
             async with self.db_connection as conn:
                 row = await conn.fetchrow(stmt, *values)
-        except UniqueViolationError as e:
-            raise ErrorHandler.handle_unique_violation("Bank", e, bank_update)
+        except UniqueViolationError as exc:
+            raise ErrorHandler.handle_unique_violation("Bank", exc, bank_update)
 
         if row:
-            return BankRead(**dict(row))
+            return BankDatabaseMapper.from_db_row(row)
 
-        raise NotFoundError("Bank", "id", bank_id)
+        raise NotFoundError(f"Bank with id = {bank_id} not found")
 
     async def delete_bank_by_id(self, bank_id: int) -> None:
         stmt = "DELETE FROM banks WHERE id = $1"
@@ -77,4 +74,4 @@ class BankRepository(AbstractBankRepository):
             result = await conn.execute(stmt, bank_id)
 
         if result == "DELETE 0":
-            raise NotFoundError("Bank", "id", bank_id)
+            raise NotFoundError(f"Bank with id = {bank_id} not found")

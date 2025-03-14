@@ -2,14 +2,14 @@ from abc import ABC, abstractmethod
 from decimal import Decimal
 from typing import List
 
-from src.domain.schemas.account import AccountRead, AccountCreate
+from src.domain.entities.account import Account
 
 
 class AbstractAccountRepository(ABC):
     """Abstract class for an account repository."""
 
     @abstractmethod
-    async def get_account_by_id(self, account_id) -> AccountRead:
+    async def get_account_by_id(self, account_id) -> Account:
         """Fetches an account by its unique identifier.
 
         Raises:
@@ -18,12 +18,12 @@ class AbstractAccountRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_accounts_by_user_id(self, user_id) -> List[AccountRead]:
+    async def get_accounts_by_user_id(self, user_id) -> List[Account]:
         """Fetches all accounts associated with a specific user."""
         pass
 
     @abstractmethod
-    async def create_account(self, account_create: AccountCreate) -> AccountRead:
+    async def create_account(self, account_create: Account) -> Account:
         """Creates a new account.
 
         Raises:
@@ -33,7 +33,17 @@ class AbstractAccountRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_account_balance(self, account_id: int, amount: Decimal) -> AccountRead:
+    async def update_account(self, account_id: int, account_update: Account) -> Account:
+        """Updates an account by its unique identifier.
+
+        Raises:
+            NotFoundError: If the account with the specified id is not found.
+            NoFieldsToUpdateError: If no fields are provided for updating.
+        """
+        pass
+
+    @abstractmethod
+    async def update_account_balance(self, account_id: int, amount: Decimal) -> Account:
         """Updates the balance of an account.
 
         Raises:

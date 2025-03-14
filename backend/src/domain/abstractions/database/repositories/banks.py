@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from src.domain.schemas.bank import BankRead, BankUpdate, BankCreate
+from src.domain.entities.bank import Bank
 
 
 class AbstractBankRepository(ABC):
     """Abstract class for a bank repository."""
 
     @abstractmethod
-    async def get_bank_by_id(self, bank_id: int) -> BankRead:
+    async def get_bank_by_id(self, bank_id: int) -> Bank:
         """Fetches a bank by its unique identifier.
 
         Raises:
@@ -17,12 +17,12 @@ class AbstractBankRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_banks(self) -> List[BankRead]:
-        """Fetches all banks from the repository."""
+    async def get_banks(self) -> List[Bank]:
+        """Fetches banks from the repository."""
         pass
 
     @abstractmethod
-    async def create_bank(self, bank_create: BankCreate) -> BankRead:
+    async def create_bank(self, bank_create: Bank) -> Bank:
         """Creates a new bank.
 
         Raises:
@@ -32,7 +32,7 @@ class AbstractBankRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_bank_by_id(self, bank_id: int, bank_update: BankUpdate) -> BankRead:
+    async def update_bank_by_id(self, bank_id: int, bank_update: Bank) -> Bank:
         """Updates a bank by its unique identifier.
 
         Raises:

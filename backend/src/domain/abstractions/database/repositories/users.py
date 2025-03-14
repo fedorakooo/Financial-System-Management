@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from src.domain.schemas.user import UserRead, UserCreate, UserUpdate
+from src.domain.entities.user import User
 
 
 class AbstractUserRepository(ABC):
     """Abstract class for a user repository."""
 
     @abstractmethod
-    async def get_user_by_id(self, user_id: int) -> UserRead:
+    async def get_user_by_id(self, user_id: int) -> User:
         """Fetches a user by its unique identifier.
 
         Raises:
@@ -17,7 +17,7 @@ class AbstractUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_user_by_phone_number(self, phone_number: str) -> UserRead:
+    async def get_user_by_phone_number(self, phone_number: str) -> User:
         """Fetches a user by their phone number.
 
         Raises:
@@ -35,12 +35,12 @@ class AbstractUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_users(self) -> List[UserRead]:
-        """Fetches all users from the repository."""
+    async def get_users(self) -> List[User]:
+        """Fetches users from the repository."""
         pass
 
     @abstractmethod
-    async def create_user(self, user_create: UserCreate) -> UserRead:
+    async def create_user(self, user_create: User) -> User:
         """Creates a new user.
 
         Raises:
@@ -49,7 +49,7 @@ class AbstractUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_user_by_id(self, user_id: int, user_update: UserUpdate) -> UserRead:
+    async def update_user_by_id(self, user_id: int, user_update: User) -> User:
         """Updates a user by its unique identifier.
 
         Raises:
