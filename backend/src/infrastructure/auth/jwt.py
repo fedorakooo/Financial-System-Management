@@ -2,17 +2,22 @@ import jwt
 from datetime import timedelta, datetime
 from typing import Optional, Union
 
-from src.config import settings
-from src.domain.exceptions.jwt import InvalidTokenError, ExpiredTokenError, TokenDecodeError, TokenCreationError
+from src.domain.abstractions.auth.jwt_handler import AbstractJWTHandler
+from src.infrastructure.exceptions.jwt_exceptions import (
+    InvalidTokenError,
+    ExpiredTokenError,
+    TokenDecodeError,
+    TokenCreationError
+)
 
 
-class JWTService:
+class JWTHandler(AbstractJWTHandler):
     def __init__(
             self,
-            private_key: str = settings.auth_jwt.private_key_path.read_text(),
-            public_key: str = settings.auth_jwt.public_key_path.read_text(),
-            algorithm: str = settings.auth_jwt.algorithm,
-            expire_minutes: int = settings.auth_jwt.access_token_expire_minutes
+            private_key: str,
+            public_key: str,
+            algorithm: str,
+            expire_minutes: int
     ):
         self.private_key = private_key
         self.public_key = public_key
@@ -24,8 +29,6 @@ class JWTService:
             payload: dict,
             expire_timedelta: Optional[timedelta] = None
     ) -> str:
-        """Generate JWT-token."""
-
         to_encode = payload.copy()
         now = datetime.utcnow()
 
@@ -38,14 +41,13 @@ class JWTService:
             exp=expire,
             iat=now
         )
-
         try:
             encoded = jwt.encode(
                 to_encode,
                 self.private_key,
                 algorithm=self.algorithm
             )
-        except Exception as e:
+        except Exception:
             raise TokenCreationError("Failed to create token")
 
         return encoded
@@ -54,8 +56,6 @@ class JWTService:
             self,
             token: Union[str, bytes]
     ) -> dict:
-        """Decodes JWT-token."""
-
         try:
             decoded = jwt.decode(
                 token,
@@ -66,7 +66,7 @@ class JWTService:
             raise ExpiredTokenError("Token has expired")
         except jwt.InvalidTokenError:
             raise InvalidTokenError("The token is invalid.")
-        except Exception as e:
+        except Exception:
             raise TokenDecodeError("Failed to decode token")
 
         return decoded
