@@ -1,23 +1,28 @@
 from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
-from pydantic import BaseModel
-from src.domain.exceptions.repository import UniqueConstraintError, ForeignKeyError
+from dataclasses import asdict, is_dataclass
+from src.infrastructure.exceptions.repository_exceptions import UniqueConstraintError, ForeignKeyError
 
 
 class ErrorHandler:
-    """Class for handling database errors."""
+    """Class for handling database handlers."""
 
     @staticmethod
     def handle_unique_violation(
             entity: str,
             error: UniqueViolationError,
-            item: BaseModel
+            item: object
     ) -> UniqueConstraintError:
-        """Handles unique constraint violation errors."""
+        """Handles unique constraint violation handlers."""
+
+        if not is_dataclass(item):
+            raise ValueError("Item must be a dataclass instance")
 
         error_message = str(error).lower()
-        for column in item.dict().keys():
+        item_dict = asdict(item)
+
+        for column in item_dict.keys():
             if column in error_message:
-                return UniqueConstraintError(entity, column, item.dict()[column])
+                return UniqueConstraintError(entity, column, item_dict[column])
 
         return UniqueConstraintError(entity, "unknown_column", "unknown_value")
 
@@ -26,7 +31,7 @@ class ErrorHandler:
             entity: str,
             error: ForeignKeyViolationError
     ) -> ForeignKeyError:
-        """Handles foreign key constraint violation errors."""
+        """Handles foreign key constraint violation handlers."""
 
         import re
         match = re.search(r"Key \((.*?)\)=\((.*?)\) is not present", error.detail)
@@ -37,4 +42,3 @@ class ErrorHandler:
 
         referenced_table = error.constraint_name.split("_")[0] if error.constraint_name else "unknown_table"
         return ForeignKeyError(entity, field, value, referenced_table)
-
