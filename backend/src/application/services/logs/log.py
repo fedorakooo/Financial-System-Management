@@ -1,7 +1,8 @@
 from src.domain.abstractions.logger.logger import AbstractLogger
+from src.application.abstractions.logs.log import AbstractLogService
 
 
-class LogService:
+class LogService(AbstractLogService):
     def __init__(self, logger: AbstractLogger):
         self.logger = logger
 
