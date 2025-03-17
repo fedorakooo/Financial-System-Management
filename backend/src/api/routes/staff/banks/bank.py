@@ -1,32 +1,36 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
+from dependency_injector.wiring import Provide, inject
 
-from src.dependencies.banks import BankDependencies
-from src.dependencies.logs import LogDependencies
-from src.domain.schemas.bank import BankCreate, BankRead, BankUpdate
-from src.services.banks.bank import BankService
-from src.domain.exceptions.repository import (
+from src.api.security import get_current_active_auth_user
+from src.application.abstractions.banks.bank_management import AbstractBankManagementService
+from src.application.abstractions.logs.log import AbstractLogService
+from src.application.dtos.user import UserAccessDTO
+from src.infrastructure.dependencies.app import Application
+from src.infrastructure.mappers.bank import BankSchemaMapper
+from src.infrastructure.schemas.bank import BankResponse, BankCreateRequest, BankUpdateRequest
+from src.infrastructure.exceptions.repository_exceptions import (
     NotFoundError,
     UniqueConstraintError,
     NoFieldsToUpdateError
 )
-from src.services.logs.log import LogService
 
-router = APIRouter(prefix="/banks", tags=["Banks"])
+router = APIRouter(prefix="/banks", tags=["Banks management"])
 
 
-@router.get("/{bank_id}", response_model=BankRead, responses={
+@router.get("/{bank_id}", response_model=BankResponse, responses={
     404: {"description": "Bank not found"},
     500: {"description": "Unexpected server error"}
 })
+@inject
 async def get_bank_by_id(
         bank_id: int,
-        bank_service: BankService = Depends(BankDependencies.get_bank_service),
-        log_service: LogService = Depends(LogDependencies.get_log_service)
-) -> BankRead:
+        bank_management_service: AbstractBankManagementService = Depends(
+            Provide[Application.services.bank_management_service]
+        ),
+        log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
+) -> BankResponse:
     try:
-        bank = await bank_service.get_bank_by_id(bank_id)
+        bank_dto = await bank_management_service.get_bank_by_id(bank_id)
         log_service.info(f"Successfully fetched bank with ID {bank_id}")
     except NotFoundError as e:
         log_service.warning(f"Bank with ID {bank_id} not found: {str(e)}")
@@ -40,21 +44,24 @@ async def get_bank_by_id(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while fetching the bank."
         )
-    return bank
+    return BankSchemaMapper.to_response(bank_dto)
 
 
-@router.get("/", response_model=List[BankRead], responses={
+@router.get("/", response_model=list[BankResponse], responses={
     500: {"description": "Unexpected server error"}
 })
+@inject
 async def get_banks(
-        bank_service: BankService = Depends(BankDependencies.get_bank_service),
-        log_service: LogService = Depends(LogDependencies.get_log_service)
-) -> List[BankRead]:
+        bank_management_service: AbstractBankManagementService = Depends(
+            Provide[Application.services.bank_management_service]
+        ),
+        log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
+) -> list[BankResponse]:
     try:
-        banks = await bank_service.get_banks()
+        banks = await bank_management_service.get_banks()
         log_service.info(f"Successfully fetched {len(banks)} banks")
-    except Exception as e:
-        log_service.error(f"An unexpected error occurred while fetching the list of banks: {str(e)}")
+    except Exception as exc:
+        log_service.error(f"An unexpected error occurred while fetching the list of banks: {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while fetching the list of banks."
@@ -62,18 +69,22 @@ async def get_banks(
     return banks
 
 
-@router.post("/", response_model=BankRead, responses={
+@router.post("/", response_model=BankResponse, responses={
     409: {"description": "A bank with these details already exists"},
     500: {"description": "Unexpected server error"}
 })
+@inject
 async def create_bank(
-        bank_create: BankCreate,
-        bank_service: BankService = Depends(BankDependencies.get_bank_service),
-        log_service: LogService = Depends(LogDependencies.get_log_service)
-) -> BankRead:
+        bank_create: BankCreateRequest,
+        requesting_user: UserAccessDTO = Depends(get_current_active_auth_user),
+        bank_management_service: AbstractBankManagementService = Depends(
+            Provide[Application.services.bank_management_service]
+        ),
+        log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
+) -> BankResponse:
     log_service.info(f"Creating bank with name {bank_create.name}")
     try:
-        created_bank = await bank_service.create_bank(bank_create)
+        created_bank = await bank_management_service.create_bank(bank_create, requesting_user)
         log_service.info(f"Bank with name {created_bank.name} and ID {created_bank.id} successfully created")
     except UniqueConstraintError as e:
         log_service.error(
@@ -83,9 +94,9 @@ async def create_bank(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(e)
         )
-    except Exception as e:
+    except Exception as exc:
         log_service.error(
-            f"An unexpected error occurred while creating the bank with name {bank_create.name}: {str(e)}"
+            f"An unexpected error occurred while creating the bank with name {bank_create.name}: {str(exc)}"
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -94,21 +105,25 @@ async def create_bank(
     return created_bank
 
 
-@router.patch("/{bank_id}", response_model=BankRead, responses={
+@router.patch("/{bank_id}", response_model=BankResponse, responses={
     404: {"description": "Bank not found"},
     400: {"description": "No fields to update"},
     409: {"description": "Conflict due to a unique constraint violation"},
     500: {"description": "Unexpected server error"}
 })
+@inject
 async def update_bank_by_id(
         bank_id: int,
-        bank_update: BankUpdate,
-        bank_service: BankService = Depends(BankDependencies.get_bank_service),
-        log_service: LogService = Depends(LogDependencies.get_log_service)
-) -> BankRead:
+        bank_update: BankUpdateRequest,
+        requesting_user: UserAccessDTO = Depends(get_current_active_auth_user),
+        bank_management_service: AbstractBankManagementService = Depends(
+            Provide[Application.services.bank_management_service]
+        ),
+        log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
+) -> BankResponse:
     log_service.info(f"Updating bank with ID {bank_id}")
     try:
-        updated_bank = await bank_service.update_bank_by_id(bank_id, bank_update)
+        updated_bank = await bank_management_service.update_bank_by_id(bank_id, bank_update, requesting_user)
         log_service.info(f"Bank with ID {bank_id} successfully updated")
     except NotFoundError as e:
         log_service.error(f"Bank with ID {bank_id} not found for update: {str(e)}")
@@ -128,7 +143,8 @@ async def update_bank_by_id(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(e)
         )
-    except Exception as e:
+    except Exception as exc:
+        raise exc
         log_service.error(f"An unexpected error while updating the bank with ID {bank_id}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -143,12 +159,15 @@ async def update_bank_by_id(
 })
 async def delete_bank_by_id(
         bank_id: int,
-        bank_service: BankService = Depends(BankDependencies.get_bank_service),
-        log_service: LogService = Depends(LogDependencies.get_log_service)
+        bank_management_service: AbstractBankManagementService = Depends(
+            Provide[Application.services.bank_management_service]
+        ),
+        log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
+
 ) -> dict:
     log_service.info(f"Deleting bank with ID {bank_id}")
     try:
-        await bank_service.delete_bank_by_id(bank_id)
+        await bank_management_service.delete_bank_by_id(bank_id)
         log_service.info(f"Bank with ID {bank_id} deleted successfully")
     except NotFoundError as e:
         log_service.warning(f"Bank with ID {bank_id} not found for deletion: {str(e)}")
@@ -156,8 +175,8 @@ async def delete_bank_by_id(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
-    except Exception as e:
-        log_service.error(f"An unexpected error while deleting the bank with ID {bank_id}: {str(e)}")
+    except Exception as exc:
+        log_service.error(f"An unexpected error while deleting the bank with ID {bank_id}: {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An unexpected error occurred while deleting the bank with id {bank_id}."
