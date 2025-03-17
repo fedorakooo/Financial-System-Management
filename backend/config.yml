@@ -1,0 +1,27 @@
+core:
+  logging:
+    version: 1
+    formatters:
+      formatter:
+        format: "[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s"
+    handlers:
+      console:
+        class: "logging.StreamHandler"
+        level: "DEBUG"
+        formatter: "formatter"
+        stream: "ext://sys.stderr"
+      file:
+        class: "logging.FileHandler"
+        level: "INFO"
+        formatter: "formatter"
+        filename: "app.log"
+    root:
+      level: "INFO"
+      handlers:
+        - "console"
+        - "file"
+  jwt_handler:
+    private_key_path: "certs/jwt-private.pem"
+    public_key_path: "certs/jwt-public.pem"
+    algorithm: "RS256"
+    expire_minutes: 120
