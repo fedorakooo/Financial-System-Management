@@ -9,6 +9,5 @@ class AdditionSource(Enum):
     OTHER = "OTHER"
 
 class AdditionStatus(Enum):
-    PENDING = 'PENDING'
     COMPLETED = 'COMPLETED'
     FAILED = 'FAILED'

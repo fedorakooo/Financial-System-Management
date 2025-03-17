@@ -12,5 +12,5 @@ class Addition:
     amount: Decimal("0.00")
     source: AdditionSource
     id: Optional[int] = None
-    status: AdditionStatus = AdditionStatus.PENDING
+    status: AdditionStatus = AdditionStatus.COMPLETED
     created_at: Optional[datetime] = None
