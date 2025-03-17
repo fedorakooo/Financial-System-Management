@@ -5,17 +5,15 @@ from pydantic import BaseModel
 from src.domain.enums.addition import AdditionSource, AdditionStatus
 
 
-class AdditionBase(BaseModel):
-    amount: Decimal = Decimal("0.00")
-    account_id: int
-    source: AdditionSource
-    status: AdditionStatus = AdditionStatus.PENDING
-
-
-class AdditionCreate(AdditionBase):
-    account_id: int
-
-
-class AdditionRead(AdditionBase):
+class AdditionResponse(BaseModel):
     id: int
+    amount: Decimal = Decimal("0.00")
+    source: AdditionSource
+    account_id: int
+    status: AdditionStatus
     created_at: datetime
+
+
+class AdditionCreateRequest(BaseModel):
+    amount: Decimal = Decimal("0.00")
+    source: AdditionSource
