@@ -2,7 +2,6 @@ from datetime import datetime
 
 from src.application.dtos.addition import AdditionCreateDTO, AdditionReadDTO
 from src.domain.entities.addition import Addition
-from src.domain.enums.addition import AdditionStatus
 
 
 class AdditionMapper:
@@ -14,7 +13,6 @@ class AdditionMapper:
             account_id=account_id,
             amount=dto.amount,
             source=dto.source,
-            status=AdditionStatus.PENDING,
             created_at=datetime.now()
         )
 
@@ -25,6 +23,5 @@ class AdditionMapper:
             account_id=addition.account_id,
             amount=addition.amount,
             source=addition.source,
-            status=addition.status,
             created_at=addition.created_at
         )

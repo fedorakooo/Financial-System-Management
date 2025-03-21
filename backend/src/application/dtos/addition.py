@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from src.domain.enums.addition import AdditionSource, AdditionStatus
+from src.domain.enums.addition import AdditionSource
 
 
 @dataclass(frozen=True)
@@ -11,7 +11,6 @@ class AdditionReadDTO:
     account_id: int
     amount: Decimal("0.00")
     source: AdditionSource
-    status: AdditionStatus
     created_at: datetime
 
 

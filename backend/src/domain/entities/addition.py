@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from src.domain.enums.addition import AdditionSource, AdditionStatus
+from src.domain.enums.addition import AdditionSource
 
 
 @dataclass(frozen=True)
@@ -12,5 +12,4 @@ class Addition:
     amount: Decimal("0.00")
     source: AdditionSource
     id: Optional[int] = None
-    status: AdditionStatus = AdditionStatus.COMPLETED
     created_at: Optional[datetime] = None

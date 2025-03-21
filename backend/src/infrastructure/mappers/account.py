@@ -3,7 +3,7 @@ from src.infrastructure.schemas.account import AccountResponse, AccountUpdateReq
 
 
 class AccountSchemaMapper:
-    """Utility class for mapping between Data Transfer Objects (DTOs) and Pydantic models for the Bank entity."""
+    """Utility class for mapping between Data Transfer Objects (DTOs) and Pydantic models for the Account entity."""
 
     # DTO -> Pydantic
     @staticmethod

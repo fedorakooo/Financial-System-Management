@@ -15,7 +15,7 @@ from src.infrastructure.exceptions.repository_exceptions import (
     NoFieldsToUpdateError
 )
 
-router = APIRouter(prefix="/users", tags=["Users management"])
+router = APIRouter(prefix="/users", tags=["Users Management"])
 
 
 @router.get("/{user_id}", response_model=UserResponse, responses={

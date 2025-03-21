@@ -78,15 +78,12 @@ class AccountRepository(AbstractAccountRepository):
 
         new_balance = account.balance + amount
 
-        if new_balance < 0:
-            raise InsufficientFundsError(account_id)
-
         stmt = "UPDATE accounts SET balance = $2 WHERE id = $1 RETURNING *"
 
         async with self.db_connection as conn:
             row = await conn.fetchrow(stmt, account_id, new_balance)
 
-        return Account(**dict(row))
+        return AccountDatabaseMapper.from_db_row(row)
 
     async def delete_account_by_id(self, account_id: int) -> None:
         stmt = "DELETE FROM accounts WHERE id = $1"

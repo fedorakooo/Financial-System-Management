@@ -6,3 +6,4 @@ class AccountStatus(Enum):
     BLOCKED = 'BLOCKED'
     FROZEN = 'FROZEN'
     ON_CONSIDERATION = 'ON_CONSIDERATION'
+    CANCELLED = 'CANCELLED'

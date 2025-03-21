@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from pydantic import BaseModel
 
-from src.domain.enums.addition import AdditionSource, AdditionStatus
+from src.domain.enums.addition import AdditionSource
 
 
 class AdditionResponse(BaseModel):
@@ -10,7 +10,6 @@ class AdditionResponse(BaseModel):
     amount: Decimal = Decimal("0.00")
     source: AdditionSource
     account_id: int
-    status: AdditionStatus
     created_at: datetime
 
 

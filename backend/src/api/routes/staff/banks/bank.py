@@ -14,7 +14,7 @@ from src.infrastructure.exceptions.repository_exceptions import (
     NoFieldsToUpdateError
 )
 
-router = APIRouter(prefix="/banks", tags=["Banks management"])
+router = APIRouter(prefix="/banks", tags=["Banks Management"])
 
 
 @router.get("/{bank_id}", response_model=BankResponse, responses={
