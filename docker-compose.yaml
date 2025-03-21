@@ -1,0 +1,54 @@
+services:
+  backend:
+    image: backend
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+    networks:
+      - app_network
+
+  frontend:
+    image: frontend
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+  database:
+    image: postgres:16.8
+    ports:
+      - "5433:5433"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+volumes:
+  db-data:
+
+networks:
+  app_network:
+    driver: bridge
