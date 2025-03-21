@@ -32,14 +32,14 @@ async def get_bank_by_id(
     try:
         bank_dto = await bank_management_service.get_bank_by_id(bank_id)
         log_service.info(f"Successfully fetched bank with ID {bank_id}")
-    except NotFoundError as e:
-        log_service.warning(f"Bank with ID {bank_id} not found: {str(e)}")
+    except NotFoundError as exc:
+        log_service.warning(f"Bank with ID {bank_id} not found: {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail=str(exc)
         )
-    except Exception as e:
-        log_service.error(f"An unexpected error occurred while fetching the bank with ID {bank_id}: {str(e)}")
+    except Exception as exc:
+        log_service.error(f"An unexpected error occurred while fetching the bank with ID {bank_id}: {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while fetching the bank."
@@ -86,13 +86,13 @@ async def create_bank(
     try:
         created_bank = await bank_management_service.create_bank(bank_create, requesting_user)
         log_service.info(f"Bank with name {created_bank.name} and ID {created_bank.id} successfully created")
-    except UniqueConstraintError as e:
+    except UniqueConstraintError as exc:
         log_service.error(
-            f"Unique constraint violation while creating the bank with name {bank_create.name}: {str(e)}"
+            f"Unique constraint violation while creating the bank with name {bank_create.name}: {str(exc)}"
         )
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
+            detail=str(exc)
         )
     except Exception as exc:
         log_service.error(
@@ -125,27 +125,27 @@ async def update_bank_by_id(
     try:
         updated_bank = await bank_management_service.update_bank_by_id(bank_id, bank_update, requesting_user)
         log_service.info(f"Bank with ID {bank_id} successfully updated")
-    except NotFoundError as e:
-        log_service.error(f"Bank with ID {bank_id} not found for update: {str(e)}")
+    except NotFoundError as exc:
+        log_service.error(f"Bank with ID {bank_id} not found for update: {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail=str(exc)
         )
-    except NoFieldsToUpdateError as e:
-        log_service.error(f"No fields to update for bank with ID {bank_id}: {str(e)}")
+    except NoFieldsToUpdateError as exc:
+        log_service.error(f"No fields to update for bank with ID {bank_id}: {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail=str(exc)
         )
-    except UniqueConstraintError as e:
-        log_service.error(f"Unique constraint violation while updating bank with ID {bank_id}: {str(e)}")
+    except UniqueConstraintError as exc:
+        log_service.error(f"Unique constraint violation while updating bank with ID {bank_id}: {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
+            detail=str(exc)
         )
     except Exception as exc:
         raise exc
-        log_service.error(f"An unexpected error while updating the bank with ID {bank_id}: {str(e)}")
+        log_service.error(f"An unexpected error while updating the bank with ID {bank_id}: {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An unexpected error occurred while updating the bank with id {bank_id}."
@@ -169,11 +169,11 @@ async def delete_bank_by_id(
     try:
         await bank_management_service.delete_bank_by_id(bank_id)
         log_service.info(f"Bank with ID {bank_id} deleted successfully")
-    except NotFoundError as e:
-        log_service.warning(f"Bank with ID {bank_id} not found for deletion: {str(e)}")
+    except NotFoundError as exc:
+        log_service.warning(f"Bank with ID {bank_id} not found for deletion: {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail=str(exc)
         )
     except Exception as exc:
         log_service.error(f"An unexpected error while deleting the bank with ID {bank_id}: {str(exc)}")

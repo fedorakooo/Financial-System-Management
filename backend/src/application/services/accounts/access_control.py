@@ -4,6 +4,8 @@ from src.domain.exceptions.forbidden import ForbiddenError
 
 
 class AccountProfileAccessControlService:
+    """Service for controlling access to account profile operations."""
+
     @staticmethod
     def can_get_account(owner_id: int, requesting_user: UserAccessDTO) -> bool:
         if owner_id == requesting_user.id and UserRole(requesting_user.role) in [UserRole.CLIENT]:
@@ -30,6 +32,8 @@ class AccountProfileAccessControlService:
 
 
 class AccountManagementAccessControlService:
+    """Service for controlling access to account management operations."""
+
     @staticmethod
     def can_get_accounts(requesting_user: UserAccessDTO) -> bool:
         if UserRole(requesting_user.role) in [

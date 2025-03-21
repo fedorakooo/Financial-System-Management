@@ -15,7 +15,6 @@ class AdditionSchemaMapper:
             account_id=dto.account_id,
             amount=dto.amount,
             source=dto.source,
-            status=dto.status,
             created_at=dto.created_at
         )
 

@@ -10,7 +10,7 @@ from src.application.dtos.user import UserAccessDTO
 from src.domain.exceptions.forbidden import ForbiddenError
 from src.infrastructure.dependencies.app import Application
 from src.infrastructure.exceptions.repository_exceptions import NotFoundError, UniqueConstraintError, ForeignKeyError
-from src.infrastructure.schemas.additions import AdditionResponse, AdditionCreateRequest
+from src.infrastructure.schemas.addition import AdditionResponse, AdditionCreateRequest
 
 router = APIRouter(prefix="/additions", tags=["Additions"])
 
@@ -36,19 +36,19 @@ async def get_additions_by_account_id(
             requesting_user
         )
         log_service.info(f"Successfully fetched additions for User ID {requesting_user.id} ({requesting_user.role})")
-    except ForbiddenError as e:
+    except ForbiddenError as exc:
         log_service.error(
-            f"User ID {requesting_user.id} ({requesting_user.role}) encountered a ForbiddenError while fetching additions: {str(e)}"
+            f"User ID {requesting_user.id} ({requesting_user.role}) encountered a ForbiddenError while fetching additions: {str(exc)}"
         )
-        raise HttpExceptionFactory.create_http_exception(status.HTTP_403_FORBIDDEN, str(e))
-    except NotFoundError as e:
+        raise HttpExceptionFactory.create_http_exception(status.HTTP_403_FORBIDDEN, str(exc))
+    except NotFoundError as exc:
         log_service.warning(
-            f"User ID {requesting_user.id} ({requesting_user.role}) tried to access non-existent additions: {str(e)}"
+            f"User ID {requesting_user.id} ({requesting_user.role}) tried to access non-existent additions: {str(exc)}"
         )
-        raise HttpExceptionFactory.create_http_exception(status.HTTP_404_NOT_FOUND, str(e))
-    except Exception as e:
+        raise HttpExceptionFactory.create_http_exception(status.HTTP_404_NOT_FOUND, str(exc))
+    except Exception as exc:
         log_service.error(
-            f"User ID {requesting_user.id} ({requesting_user.role}) encountered an error while fetching additions: {str(e)}"
+            f"User ID {requesting_user.id} ({requesting_user.role}) encountered an error while fetching additions: {str(exc)}"
         )
         raise HttpExceptionFactory.create_http_exception(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -84,25 +84,25 @@ async def create_addition(
         log_service.info(
             f"User ID {requesting_user.id} ({requesting_user.role}) successfully created addition with ID {created_addition.id}"
         )
-    except UniqueConstraintError as e:
+    except UniqueConstraintError as exc:
         log_service.error(
-            f"User ID {requesting_user.id} ({requesting_user.role}) encountered unique constraint violation while creating addition: {str(e)}"
+            f"User ID {requesting_user.id} ({requesting_user.role}) encountered unique constraint violation while creating addition: {str(exc)}"
         )
-        raise HttpExceptionFactory.create_http_exception(status.HTTP_409_CONFLICT, str(e))
-    except ForeignKeyError as e:
+        raise HttpExceptionFactory.create_http_exception(status.HTTP_409_CONFLICT, str(exc))
+    except ForeignKeyError as exc:
         log_service.error(
-            f"User ID {requesting_user.id} ({requesting_user.role}) encountered foreign key constraint violation while creating addition: {str(e)}"
+            f"User ID {requesting_user.id} ({requesting_user.role}) encountered foreign key constraint violation while creating addition: {str(exc)}"
         )
-        raise HttpExceptionFactory.create_http_exception(status.HTTP_422_UNPROCESSABLE_ENTITY, str(e))
-    except ForbiddenError as e:
+        raise HttpExceptionFactory.create_http_exception(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc))
+    except ForbiddenError as exc:
         log_service.error(
-            f"User ID {requesting_user.id} ({requesting_user.role}) encountered a ForbiddenError while creating addition: {str(e)}"
+            f"User ID {requesting_user.id} ({requesting_user.role}) encountered a ForbiddenError while creating addition: {str(exc)}"
         )
-        raise HttpExceptionFactory.create_http_exception(status.HTTP_403_FORBIDDEN, str(e))
+        raise HttpExceptionFactory.create_http_exception(status.HTTP_403_FORBIDDEN, str(exc))
     except Exception as exc:
         raise exc
         log_service.error(
-            f"User ID {requesting_user.id} ({requesting_user.role}) encountered an unexpected error while creating addition: {str(e)}"
+            f"User ID {requesting_user.id} ({requesting_user.role}) encountered an unexpected error while creating addition: {str(exc)}"
         )
         raise HttpExceptionFactory.create_http_exception(
             status.HTTP_500_INTERNAL_SERVER_ERROR,

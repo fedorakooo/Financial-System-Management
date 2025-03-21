@@ -65,25 +65,25 @@ async def create_account(
         created_account = await account_management_service.create(account_create, requesting_user.id, requesting_user.role)
         log_service.info(
             f"Account with Bank ID {created_account.bank_id} and ID {created_account.id} successfully created")
-    except UniqueConstraintError as e:
+    except UniqueConstraintError as exc:
         log_service.error(
-            f"Unique constraint violation while creating the account with Bank ID {account_create.bank_id}: {str(e)}"
+            f"Unique constraint violation while creating the account with Bank ID {account_create.bank_id}: {str(exc)}"
         )
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
+            detail=str(exc)
         )
-    except ForeignKeyError as e:
+    except ForeignKeyError as exc:
         log_service.error(
-            f"Foreign key constraint violation while creating the account with Bank ID {account_create.bank_id}: {str(e)}"
+            f"Foreign key constraint violation while creating the account with Bank ID {account_create.bank_id}: {str(exc)}"
         )
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(e)
+            detail=str(exc)
         )
-    except Exception as e:
+    except Exception as exc:
         log_service.error(
-            f"An unexpected error occurred while creating the account with Bank ID {account_create.bank_id}: {str(e)}"
+            f"An unexpected error occurred while creating the account with Bank ID {account_create.bank_id}: {str(exc)}"
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

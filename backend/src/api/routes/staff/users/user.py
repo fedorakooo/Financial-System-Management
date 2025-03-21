@@ -36,12 +36,12 @@ async def get_user_by_id(
     try:
         fetched_user_dto = await user_management_service.get_user_by_id(user_id, requesting_user)
         log_service.info(f"User with ID {requesting_user.id} successfully fetched user with ID {user_id}.")
-    except NotFoundError as e:
-        log_service.warning(f"User with ID {requesting_user.id} failed to fetch user with ID {user_id}: {str(e)}")
-        raise HttpExceptionFactory.create_http_exception(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except Exception as e:
+    except NotFoundError as exc:
+        log_service.warning(f"User with ID {requesting_user.id} failed to fetch user with ID {user_id}: {str(exc)}")
+        raise HttpExceptionFactory.create_http_exception(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except Exception as exc:
         log_service.error(
-            f"User with ID {requesting_user.id} encountered an unexpected error while fetching user with ID {user_id}: {str(e)}"
+            f"User with ID {requesting_user.id} encountered an unexpected error while fetching user with ID {user_id}: {str(exc)}"
         )
         raise HttpExceptionFactory.create_http_exception(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -66,9 +66,9 @@ async def get_users(
     try:
         fetched_users_dto = await user_management_service.get_all_users(requesting_user)
         log_service.info(f"User with ID {requesting_user.id} successfully fetched {len(fetched_users_dto)} users.")
-    except Exception as e:
+    except Exception as exc:
         log_service.error(
-            f"User with ID {requesting_user.id} encountered an unexpected error while fetching users: {str(e)}"
+            f"User with ID {requesting_user.id} encountered an unexpected error while fetching users: {str(exc)}"
         )
         raise HttpExceptionFactory.create_http_exception(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -99,24 +99,24 @@ async def update_user_by_id(
     try:
         updated_user = await user_management_service.update_user_by_id(user_id, user_update)
         log_service.info(f"User with ID {requesting_user.id} successfully updated user with ID {user_id}")
-    except NotFoundError as e:
+    except NotFoundError as exc:
         log_service.error(
-            f"User with ID {requesting_user.id} attempted to update user with ID {user_id}, but user not found: {str(e)}"
+            f"User with ID {requesting_user.id} attempted to update user with ID {user_id}, but user not found: {str(exc)}"
         )
-        raise HttpExceptionFactory.create_http_exception(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except NoFieldsToUpdateError as e:
+        raise HttpExceptionFactory.create_http_exception(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except NoFieldsToUpdateError as exc:
         log_service.error(
-            f"User with ID {requesting_user.id} attempted to update user with ID {user_id}, but no fields to update: {str(e)}"
+            f"User with ID {requesting_user.id} attempted to update user with ID {user_id}, but no fields to update: {str(exc)}"
         )
-        raise HttpExceptionFactory.create_http_exception(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except UniqueConstraintError as e:
+        raise HttpExceptionFactory.create_http_exception(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except UniqueConstraintError as exc:
         log_service.error(
-            f"User with ID {requesting_user.id} attempted to update user with ID {user_id}, but a unique constraint violation occurred: {str(e)}"
+            f"User with ID {requesting_user.id} attempted to update user with ID {user_id}, but a unique constraint violation occurred: {str(exc)}"
         )
-        raise HttpExceptionFactory.create_http_exception(status_code=status.HTTP_409_CONFLICT, detail=str(e))
-    except Exception as e:
+        raise HttpExceptionFactory.create_http_exception(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+    except Exception as exc:
         log_service.error(
-            f"User with ID {requesting_user.id} encountered an unexpected error while updating user with ID {user_id}: {str(e)}"
+            f"User with ID {requesting_user.id} encountered an unexpected error while updating user with ID {user_id}: {str(exc)}"
         )
         raise HttpExceptionFactory.create_http_exception(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -144,14 +144,14 @@ async def delete_user_by_id(
     try:
         await user_management_service.delete_user_by_id(user_id)
         log_service.info(f"User with ID {requesting_user.id} successfully deleted user with ID {user_id}")
-    except NotFoundError as e:
+    except NotFoundError as exc:
         log_service.warning(
-            f"User with ID {requesting_user.id} attempted to delete user with ID {user_id}, but user not found: {str(e)}"
+            f"User with ID {requesting_user.id} attempted to delete user with ID {user_id}, but user not found: {str(exc)}"
         )
-        HttpExceptionFactory.create_http_exception(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except Exception as e:
+        HttpExceptionFactory.create_http_exception(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except Exception as exc:
         log_service.error(
-            f"User with ID {requesting_user.id} encountered an unexpected error while deleting user with ID {user_id}: {str(e)}"
+            f"User with ID {requesting_user.id} encountered an unexpected error while deleting user with ID {user_id}: {str(exc)}"
         )
         HttpExceptionFactory.create_http_exception(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

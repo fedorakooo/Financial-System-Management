@@ -14,7 +14,6 @@ class AdditionDatabaseMapper:
             amount=row["amount"],
             source=row["source"],
             id=row["id"],
-            status=row["status"],
             created_at=row["created_at"]
         )
 
