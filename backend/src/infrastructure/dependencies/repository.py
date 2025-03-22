@@ -4,6 +4,7 @@ from src.infrastructure.database.repositories.account import AccountRepository
 from src.infrastructure.database.repositories.addition import AdditionRepository
 from src.infrastructure.database.repositories.bank import BankRepository
 from src.infrastructure.database.repositories.user import UserRepository
+from src.infrastructure.database.repositories.withdrawal import WithdrawalRepository
 
 
 class Repositories(containers.DeclarativeContainer):
@@ -28,5 +29,10 @@ class Repositories(containers.DeclarativeContainer):
 
     addition_repository = providers.Factory(
         AdditionRepository,
+        db_connection=gateways.database_connection,
+    )
+
+    withdrawal_repository = providers.Factory(
+        WithdrawalRepository,
         db_connection=gateways.database_connection,
     )

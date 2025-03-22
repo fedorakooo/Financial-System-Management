@@ -15,6 +15,8 @@ from src.application.services.logs.log import LogService
 from src.application.services.profile.profile import ProfileService
 from src.application.services.registration.registration import UserRegistrationService
 from src.application.services.users.user_management import UserManagementService
+from src.application.services.withdrawals.withdrawal_profile import WithdrawalProfileService
+from src.domain.entities.withdrawal import Withdrawal
 
 
 class Services(containers.DeclarativeContainer):
@@ -104,4 +106,10 @@ class Services(containers.DeclarativeContainer):
     account_management_service = providers.Factory(
         AccountManagementService,
         repository=repositories.account_repository,
+    )
+
+    withdrawal_profile_service = providers.Factory(
+        WithdrawalProfileService,
+        repository=repositories.withdrawal_repository,
+        account_repository=repositories.account_repository,
     )
