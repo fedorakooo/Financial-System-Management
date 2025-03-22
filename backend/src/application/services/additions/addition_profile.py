@@ -5,7 +5,6 @@ from src.application.dtos.addition import AdditionReadDTO, AdditionCreateDTO
 from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.addition import AdditionMapper
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
-from src.domain.abstractions.database.uow import AbstractUnitOfWork
 from src.domain.abstractions.database.repositories.additions import AbstractAdditionRepository
 from src.application.services.additions.access_control import AdditionProfileAccessControlService as AccessControl
 
@@ -14,10 +13,8 @@ class AdditionProfileService(AbstractAdditionProfileService):
     def __init__(
             self,
             repository: AbstractAdditionRepository,
-            account_repository: AbstractAccountRepository,
-            uow: AbstractUnitOfWork,
+            account_repository: AbstractAccountRepository
     ) -> None:
-        self.uow = uow
         self.repository = repository
         self.account_repository = account_repository
 
@@ -44,9 +41,8 @@ class AdditionProfileService(AbstractAdditionProfileService):
         AccessControl.can_create_addition(account.user_id, requesting_user)
 
         addition_create = AdditionMapper.map_addition_create_dto_to_addition(addition_create_dto, account_id)
-        async with self.uow as uow:
-            created_addition = await self.repository.create_addition(addition_create)
-            await self.account_repository.update_account_balance(account_id, created_addition.amount)
+        created_addition = await self.repository.create_addition(addition_create)
+        await self.account_repository.update_account_balance(account_id, created_addition.amount)
 
         created_addition_dto = AdditionMapper.map_addition_to_addition_read_dto(created_addition)
         return created_addition_dto

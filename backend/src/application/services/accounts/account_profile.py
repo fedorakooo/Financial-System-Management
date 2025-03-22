@@ -6,16 +6,13 @@ from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.account import AccountMapper
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.application.services.accounts.access_control import AccountProfileAccessControlService as AccessControl
-from src.domain.abstractions.database.uow import AbstractUnitOfWork
 
 
 class AccountProfileService(AbstractAccountProfileService):
     def __init__(
             self,
-            repository: AbstractAccountRepository,
-            uow: AbstractUnitOfWork,
+            repository: AbstractAccountRepository
     ):
-        self.uow = uow
         self.repository = repository
 
     async def get_account_by_id(self, account_id: int, requesting_user: UserAccessDTO) -> AccountReadDTO:
@@ -37,8 +34,7 @@ class AccountProfileService(AbstractAccountProfileService):
     ) -> AccountReadDTO:
         AccessControl.can_create_account(requesting_user)
         account_create = AccountMapper.map_account_create_dto_to_account(account_create_dto, requesting_user.id)
-        async with self.uow as uow:
-            created_account = await self.repository.create_account(account_create)
+        created_account = await self.repository.create_account(account_create)
         created_account_dto = AccountMapper.map_account_to_account_read_dto(created_account)
         return created_account_dto
 
@@ -51,7 +47,6 @@ class AccountProfileService(AbstractAccountProfileService):
         current_account = await self.repository.get_account_by_id(account_id)
         AccessControl.can_update_account(current_account.user_id, requesting_user)
         account_update = AccountMapper.map_account_update_client_dto_to_account(account_update_dto, current_account)
-        async with self.uow as uow:
-            updated_account = await self.repository.update_account(account_id, account_update)
+        updated_account = await self.repository.update_account(account_id, account_update)
         updated_account_dto = AccountMapper.map_account_to_account_read_dto(updated_account)
         return updated_account_dto

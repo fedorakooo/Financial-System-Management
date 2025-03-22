@@ -1,6 +1,5 @@
 from src.application.mappers.user import UserMapper
 from src.domain.abstractions.database.repositories.users import AbstractUserRepository
-from src.domain.abstractions.database.uow import AbstractUnitOfWork
 from src.domain.abstractions.security.password_handler import AbstractPasswordHandler
 from src.application.abstractions.registration.registration import AbstractUserRegistrationService
 from src.application.dtos.user import UserCreateDTO, UserReadDTO
@@ -11,10 +10,8 @@ class UserRegistrationService(AbstractUserRegistrationService):
     def __init__(
             self,
             repository: AbstractUserRepository,
-            uow: AbstractUnitOfWork,
             password_handler: AbstractPasswordHandler
     ):
-        self.uow = uow
         self.repository = repository
         self.password_handler = password_handler
 
@@ -29,8 +26,7 @@ class UserRegistrationService(AbstractUserRegistrationService):
             hashed_password
         )
 
-        async with self.uow as uow:
-            new_user = await self.repository.create_user(user_create)
+        new_user = await self.repository.create_user(user_create)
 
         new_user_dto = UserMapper.map_user_to_user_read_dto(new_user)
         return new_user_dto

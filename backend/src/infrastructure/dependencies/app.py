@@ -4,7 +4,6 @@ from src.infrastructure.dependencies.core import Core
 from src.infrastructure.dependencies.gateways import Gateways
 from src.infrastructure.dependencies.repository import Repositories
 from src.infrastructure.dependencies.services import Services
-from src.infrastructure.dependencies.uow import UnitOfWorkContainer
 
 
 class Application(containers.DeclarativeContainer):
@@ -31,17 +30,9 @@ class Application(containers.DeclarativeContainer):
         gateways=gateways,
     )
 
-    uow = providers.Container(
-        UnitOfWorkContainer,
-        config=config.uow,
-        gateways=gateways,
-    )
-
     services = providers.Container(
         Services,
         config=config.services,
         repositories=repositories,
         core=core,
-        uow=uow,
-        gateways=gateways,
     )

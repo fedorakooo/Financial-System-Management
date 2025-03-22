@@ -23,7 +23,6 @@ class Services(containers.DeclarativeContainer):
     repositories = providers.DependenciesContainer()
     core = providers.DependenciesContainer()
     uow = providers.DependenciesContainer()
-    gateways = providers.DependenciesContainer()
 
     log_service = providers.Factory(
         LogService,
@@ -83,31 +82,26 @@ class Services(containers.DeclarativeContainer):
 
     account_profile_service = providers.Factory(
         AccountProfileService,
-        uow=uow.uow,
         repository=repositories.account_repository,
     )
 
     addition_profile_service = providers.Factory(
         AdditionProfileService,
-        uow=uow.uow,
         repository=repositories.addition_repository,
         account_repository=repositories.account_repository,
     )
 
     bank_management_service = providers.Factory(
         BankManagementService,
-        uow=uow.uow,
         repository=repositories.bank_repository,
     )
 
     user_management_service = providers.Factory(
         UserManagementService,
-        uow=uow.uow,
         repository=repositories.user_repository,
     )
 
     account_management_service = providers.Factory(
         AccountManagementService,
-        uow=uow.uow,
         repository=repositories.account_repository,
     )
