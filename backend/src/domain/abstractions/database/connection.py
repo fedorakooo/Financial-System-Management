@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from src.config import settings
-
 
 class AbstractDatabaseConnection(ABC):
     """Abstract class for managing a database connection."""

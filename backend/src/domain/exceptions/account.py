@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+
 class AccountError(Exception):
     """Base exception for account handlers."""
     pass
@@ -19,4 +22,13 @@ class StatusChangeNotAllowedError(AccountError):
         self.requested_status = requested_status
         super().__init__(
             f"Status change from {self.current_status} to {self.requested_status} is not allowed"
+        )
+
+class InsufficientFundsError(AccountError):
+    """Exception raised when there are insufficient funds to perform an operation."""
+
+    def __init__(self, current_balance: Decimal):
+        self.current_balance = current_balance
+        super().__init__(
+            f"Insufficient funds. Current balance: {self.current_balance}"
         )

@@ -1,13 +1,10 @@
-from src.application.dtos.account import AccountReadDTO, AccountUpdateClientDTO, AccountUpdateStaffDTO, AccountCreateDTO
 from src.application.dtos.addition import AdditionReadDTO, AdditionCreateDTO
-from src.infrastructure.schemas.account import AccountResponse, AccountUpdateRequest, AccountCreateRequest
 from src.infrastructure.schemas.addition import AdditionResponse, AdditionCreateRequest
 
 
 class AdditionSchemaMapper:
     """Utility class for mapping between Data Transfer Objects (DTOs) and Pydantic models for the Addition entity."""
 
-    # DTO -> Pydantic
     @staticmethod
     def to_response(dto: AdditionReadDTO) -> AdditionResponse:
         return AdditionResponse(
@@ -18,7 +15,6 @@ class AdditionSchemaMapper:
             created_at=dto.created_at
         )
 
-    # Pydantic -> DTO
     @staticmethod
     def from_create_request(request: AdditionCreateRequest) -> AdditionCreateDTO:
         return AdditionCreateDTO(

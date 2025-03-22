@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from dependency_injector.wiring import Provide, inject
-from typing import List
 
 from src.api.security import get_current_active_auth_user
-from src.api.routes.client.profile.accounts.operations.additions import router as addition_router
 from src.application.abstractions.accounts.account_profile import AbstractAccountProfileService
 from src.application.abstractions.logs.log import AbstractLogService
 from src.application.dtos.user import UserAccessDTO
@@ -20,11 +18,15 @@ from src.infrastructure.exceptions.repository_exceptions import (
     NoFieldsToUpdateError
 )
 
+from src.api.routes.client.profile.accounts.operations.addition import router as addition_router
+from src.api.routes.client.profile.accounts.operations.withdrawals import router as withdrawal_router
+
 router = APIRouter(prefix="/accounts", tags=["Accounts"])
 router.include_router(addition_router)
+router.include_router(withdrawal_router)
 
 
-@router.get("/{account_id}", response_model=List[AccountResponse], responses={
+@router.get("/{account_id}", response_model=list[AccountResponse], responses={
     401: {"description": "Invalid or expired token"},
     403: {"description": "User is inactive"},
     404: {"description": "Account not found"},
@@ -38,7 +40,7 @@ async def get_account_by_id(
             Provide[Application.services.account_profile_service]
         ),
         log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
-) -> List[AccountResponse]:
+) -> list[AccountResponse]:
     log_service.info(f"User ID {requesting_user.id} ({requesting_user.role}) is fetching account with ID {account_id}")
     try:
         fetched_account_dto = await account_profile_service.get_account_by_id(account_id, requesting_user)
@@ -69,7 +71,7 @@ async def get_account_by_id(
     return AccountSchemaMapper.to_response(fetched_account_dto)
 
 
-@router.get("/", response_model=List[AccountResponse], responses={
+@router.get("/", response_model=list[AccountResponse], responses={
     401: {"description": "Invalid or expired token"},
     403: {"description": "User is inactive"},
     500: {"description": "Unexpected server error"}
@@ -81,7 +83,7 @@ async def get_user_accounts(
             Provide[Application.services.account_profile_service]
         ),
         log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
-) -> List[AccountResponse]:
+) -> list[AccountResponse]:
     log_service.info(f"User ID {requesting_user.id} ({requesting_user.role}) is fetching accounts")
     try:
         fetched_accounts_dto = await account_profile_service.get_accounts(requesting_user)

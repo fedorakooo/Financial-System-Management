@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, status
 from dependency_injector.wiring import inject, Provide
-from typing import List
 
 from src.api.exceptions.exception_factory import HttpExceptionFactory
 from src.api.security import get_current_active_auth_user
@@ -15,7 +14,7 @@ from src.infrastructure.schemas.addition import AdditionResponse, AdditionCreate
 router = APIRouter(prefix="/additions", tags=["Additions"])
 
 
-@router.get("/", response_model=List[AdditionResponse], responses={
+@router.get("/", response_model=list[AdditionResponse], responses={
     401: {"description": "Invalid or expired token"},
     403: {"description": "User is inactive"},
     500: {"description": "Unexpected server error"}
@@ -28,7 +27,7 @@ async def get_additions_by_account_id(
             Provide[Application.services.addition_profile_service]
         ),
         log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
-) -> List[AdditionResponse]:
+) -> list[AdditionResponse]:
     try:
         log_service.info(f"User ID {requesting_user.id} ({requesting_user.role}) is fetching additions")
         fetched_additions = await addition_profile_service.get_additions_by_account_id(

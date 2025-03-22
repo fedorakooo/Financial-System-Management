@@ -1,6 +1,4 @@
 from abc import ABC, abstractmethod
-from decimal import Decimal
-from typing import List
 
 from src.domain.entities.account import Account
 
@@ -18,7 +16,7 @@ class AbstractAccountRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_accounts_by_user_id(self, user_id) -> List[Account]:
+    async def get_accounts_by_user_id(self, user_id) -> list[Account]:
         """Fetches all accounts associated with a specific user."""
         pass
 
@@ -39,16 +37,6 @@ class AbstractAccountRepository(ABC):
         Raises:
             NotFoundError: If the account with the specified id is not found.
             NoFieldsToUpdateError: If no fields are provided for updating.
-        """
-        pass
-
-    @abstractmethod
-    async def update_account_balance(self, account_id: int, amount: Decimal) -> Account:
-        """Updates the balance of an account.
-
-        Raises:
-            NotFoundError: If the account with the specified id is not found.
-            InsufficientFundsError: If the account balance is insufficient for the transaction.
         """
         pass
 

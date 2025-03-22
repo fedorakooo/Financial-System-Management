@@ -2,9 +2,11 @@ from dependency_injector import containers, providers
 
 from src.infrastructure.database.repositories.account import AccountRepository
 from src.infrastructure.database.repositories.addition import AdditionRepository
+from src.infrastructure.database.repositories.addition_manager import AdditionManagerRepository
 from src.infrastructure.database.repositories.bank import BankRepository
 from src.infrastructure.database.repositories.user import UserRepository
 from src.infrastructure.database.repositories.withdrawal import WithdrawalRepository
+from src.infrastructure.database.repositories.withdrawal_manager import WithdrawalManagerRepository
 
 
 class Repositories(containers.DeclarativeContainer):
@@ -34,5 +36,15 @@ class Repositories(containers.DeclarativeContainer):
 
     withdrawal_repository = providers.Factory(
         WithdrawalRepository,
+        db_connection=gateways.database_connection,
+    )
+
+    addition_manager_repository = providers.Factory(
+        AdditionManagerRepository,
+        db_connection=gateways.database_connection,
+    )
+
+    withdrawal_manager_repository = providers.Factory(
+        WithdrawalManagerRepository,
         db_connection=gateways.database_connection,
     )

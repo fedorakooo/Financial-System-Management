@@ -24,12 +24,3 @@ class AbstractAdditionRepository(ABC):
     async def get_additions_by_account_id(self, account_id: int) -> List[Addition]:
         """Fetches all additions associated with a specific user."""
         pass
-
-    async def create_addition(self, addition_create: Addition) -> Addition:
-        """Creates a new addition.
-
-        Raises:
-            UniqueConstraintError: If there is a violation of unique constraints.
-            ForeignKeyError: If a foreign key constraint violation occurs.
-        """
-        pass

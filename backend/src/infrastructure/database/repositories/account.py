@@ -1,5 +1,3 @@
-from decimal import Decimal
-from typing import List
 from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 
 from src.domain.abstractions.database.connection import AbstractDatabaseConnection
@@ -25,7 +23,7 @@ class AccountRepository(AbstractAccountRepository):
 
         raise NotFoundError(f"Account with id {account_id} not found")
 
-    async def get_accounts_by_user_id(self, user_id) -> List[Account]:
+    async def get_accounts_by_user_id(self, user_id) -> list[Account]:
         stmt = "SELECT * FROM accounts WHERE user_id = $1"
 
         async with self.db_connection as conn:
@@ -71,15 +69,6 @@ class AccountRepository(AbstractAccountRepository):
             return AccountDatabaseMapper.from_db_row(row)
 
         raise NotFoundError(f"Account with id {account_id} not found")
-
-
-    async def update_account_balance(self, account_id: int, amount: Decimal) -> Account:
-        stmt = "UPDATE accounts SET balance = $2 WHERE id = $1 RETURNING *"
-
-        async with self.db_connection as conn:
-            row = await conn.fetchrow(stmt, account_id, amount)
-
-        return AccountDatabaseMapper.from_db_row(row)
 
     async def delete_account_by_id(self, account_id: int) -> None:
         stmt = "DELETE FROM accounts WHERE id = $1"

@@ -91,6 +91,7 @@ class Services(containers.DeclarativeContainer):
         AdditionProfileService,
         repository=repositories.addition_repository,
         account_repository=repositories.account_repository,
+        manager_repository=repositories.addition_manager_repository,
     )
 
     bank_management_service = providers.Factory(
@@ -112,4 +113,6 @@ class Services(containers.DeclarativeContainer):
         WithdrawalProfileService,
         repository=repositories.withdrawal_repository,
         account_repository=repositories.account_repository,
+        manager_repository=repositories.withdrawal_manager_repository,
     )
+

@@ -1,10 +1,9 @@
-from typing import List
-
 from src.application.abstractions.additions.addition_profile import AbstractAdditionProfileService
 from src.application.dtos.addition import AdditionReadDTO, AdditionCreateDTO
 from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.addition import AdditionMapper
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
+from src.domain.abstractions.database.repositories.addition_manager import AbstractAdditionManagerRepository
 from src.domain.abstractions.database.repositories.additions import AbstractAdditionRepository
 from src.application.services.additions.access_control import AdditionProfileAccessControlService as AccessControl
 
@@ -13,16 +12,18 @@ class AdditionProfileService(AbstractAdditionProfileService):
     def __init__(
             self,
             repository: AbstractAdditionRepository,
-            account_repository: AbstractAccountRepository
+            account_repository: AbstractAccountRepository,
+            manager_repository: AbstractAdditionManagerRepository
     ) -> None:
         self.repository = repository
         self.account_repository = account_repository
+        self.manager_repository = manager_repository
 
     async def get_additions_by_account_id(
             self,
             account_id: int,
             requesting_user: UserAccessDTO
-    ) -> List[AdditionReadDTO]:
+    ) -> list[AdditionReadDTO]:
         account = await self.account_repository.get_account_by_id(account_id)
         AccessControl.can_get_additions(account.user_id, requesting_user)
 
@@ -42,8 +43,8 @@ class AdditionProfileService(AbstractAdditionProfileService):
 
         new_account_balance = account.balance + addition_create_dto.amount
         addition_create = AdditionMapper.map_addition_create_dto_to_addition(addition_create_dto, account_id)
-        created_addition = await self.repository.create_addition(addition_create)
-        await self.account_repository.update_account_balance(account_id, new_account_balance)
+        created_addition = await self.manager_repository.create_addition_with_balance_updates(addition_create,
+                                                                                              new_account_balance)
 
         created_addition_dto = AdditionMapper.map_addition_to_addition_read_dto(created_addition)
         return created_addition_dto
