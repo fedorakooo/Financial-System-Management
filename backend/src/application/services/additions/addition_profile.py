@@ -40,9 +40,10 @@ class AdditionProfileService(AbstractAdditionProfileService):
         account = await self.account_repository.get_account_by_id(account_id)
         AccessControl.can_create_addition(account.user_id, requesting_user)
 
+        new_account_balance = account.balance + addition_create_dto.amount
         addition_create = AdditionMapper.map_addition_create_dto_to_addition(addition_create_dto, account_id)
         created_addition = await self.repository.create_addition(addition_create)
-        await self.account_repository.update_account_balance(account_id, created_addition.amount)
+        await self.account_repository.update_account_balance(account_id, new_account_balance)
 
         created_addition_dto = AdditionMapper.map_addition_to_addition_read_dto(created_addition)
         return created_addition_dto

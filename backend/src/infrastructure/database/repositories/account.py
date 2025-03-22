@@ -74,14 +74,10 @@ class AccountRepository(AbstractAccountRepository):
 
 
     async def update_account_balance(self, account_id: int, amount: Decimal) -> Account:
-        account: Account = await self.get_account_by_id(account_id)
-
-        new_balance = account.balance + amount
-
         stmt = "UPDATE accounts SET balance = $2 WHERE id = $1 RETURNING *"
 
         async with self.db_connection as conn:
-            row = await conn.fetchrow(stmt, account_id, new_balance)
+            row = await conn.fetchrow(stmt, account_id, amount)
 
         return AccountDatabaseMapper.from_db_row(row)
 
