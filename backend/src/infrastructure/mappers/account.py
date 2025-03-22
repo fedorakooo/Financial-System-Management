@@ -5,7 +5,6 @@ from src.infrastructure.schemas.account import AccountResponse, AccountUpdateReq
 class AccountSchemaMapper:
     """Utility class for mapping between Data Transfer Objects (DTOs) and Pydantic models for the Account entity."""
 
-    # DTO -> Pydantic
     @staticmethod
     def to_response(dto: AccountReadDTO) -> AccountResponse:
         return AccountResponse(
@@ -18,7 +17,6 @@ class AccountSchemaMapper:
             updated_at=dto.updated_at
         )
 
-    # Pydantic -> DTO
     @staticmethod
     def from_create_request(request: AccountCreateRequest, user_id) -> AccountCreateDTO:
         return AccountCreateDTO(

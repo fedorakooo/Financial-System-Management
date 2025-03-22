@@ -1,5 +1,4 @@
 from decimal import Decimal
-from typing import Dict
 
 from src.domain.entities.account import Account
 from src.domain.enums.account import AccountStatus
@@ -21,7 +20,7 @@ class AccountDatabaseMapper:
         )
 
     @staticmethod
-    def to_db_row(account: Account) -> Dict:
+    def to_db_row(account: Account) -> dict:
         return {
             "bank_id": account.bank_id,
             "status": account.status.value,

@@ -23,5 +23,4 @@ class BankCreateDTO:
 @dataclass(frozen=True)
 class BankUpdateDTO:
     name: Optional[str]
-    bic: Optional[str]
     address: Optional[str]

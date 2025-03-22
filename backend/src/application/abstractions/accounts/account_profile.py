@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from src.application.dtos.account import AccountCreateDTO, AccountReadDTO, AccountUpdateClientDTO
 from src.application.dtos.user import UserAccessDTO
@@ -14,7 +13,7 @@ class AbstractAccountProfileService(ABC):
         pass
 
     @abstractmethod
-    async def get_accounts(self, requesting_user: UserAccessDTO) -> List[AccountCreateDTO]:
+    async def get_accounts(self, requesting_user: UserAccessDTO) -> list[AccountCreateDTO]:
         """Retrieve accounts associated with the requesting user."""
         pass
 

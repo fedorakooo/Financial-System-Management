@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from src.application.dtos.account import AccountReadDTO, AccountUpdateStaffDTO
 from src.application.dtos.user import UserAccessDTO
@@ -9,7 +8,7 @@ class AbstractAccountManagementService(ABC):
     """Abstract service for staff-level users to manage accounts."""
 
     @abstractmethod
-    async def get_accounts_by_user_id(self, user_id: int, requesting_user: UserAccessDTO) -> List[AccountReadDTO]:
+    async def get_accounts_by_user_id(self, user_id: int, requesting_user: UserAccessDTO) -> list[AccountReadDTO]:
         """Retrieve accounts information by user id."""
         pass
 

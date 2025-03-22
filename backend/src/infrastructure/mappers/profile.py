@@ -5,7 +5,6 @@ from src.infrastructure.schemas.profile import ProfileResponse, ProfileUpdateReq
 class ProfileSchemaMapper:
     """Utility class for mapping between Data Transfer Objects (DTOs) and Pydantic models for the Profile entity."""
 
-    # DTO -> Pydantic
     @staticmethod
     def to_response(dto: ProfileReadDTO) -> ProfileResponse:
         return ProfileResponse(
@@ -21,7 +20,6 @@ class ProfileSchemaMapper:
             updated_at=dto.updated_at
         )
 
-    # Pydantic -> DTO
     @staticmethod
     def from_update_request(request: ProfileUpdateRequest) -> ProfileUpdateDTO:
         return ProfileUpdateDTO(

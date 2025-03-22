@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from src.domain.entities.bank import Bank
 
@@ -17,7 +16,7 @@ class AbstractBankRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_banks(self) -> List[Bank]:
+    async def get_banks(self) -> list[Bank]:
         """Fetches banks from the repository."""
         pass
 

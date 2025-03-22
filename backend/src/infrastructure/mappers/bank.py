@@ -5,7 +5,6 @@ from src.infrastructure.schemas.bank import BankResponse, BankCreateRequest, Ban
 class BankSchemaMapper:
     """Utility class for mapping between Data Transfer Objects (DTOs) and Pydantic models for the Bank entity."""
 
-    # DTO -> Pydantic
     @staticmethod
     def to_response(dto: BankReadDTO) -> BankResponse:
         return BankResponse(
@@ -17,7 +16,6 @@ class BankSchemaMapper:
             updated_at=dto.updated_at
         )
 
-    # Pydantic -> DTO
     @staticmethod
     def from_create_request(request: BankCreateRequest) -> BankCreateDTO:
         return BankCreateDTO(
@@ -30,5 +28,5 @@ class BankSchemaMapper:
     def from_update_request(request: BankUpdateRequest) -> BankUpdateDTO:
         return BankUpdateDTO(
             name=request.name if hasattr(request, 'name') else None,
-            address=request.address if hasattr(request, 'address') else None
+            address=request.address if hasattr(request, 'address') else None,
         )

@@ -1,4 +1,3 @@
-from typing import Dict
 from datetime import datetime
 from src.domain.entities.bank import Bank
 
@@ -18,7 +17,7 @@ class BankDatabaseMapper:
         )
 
     @staticmethod
-    def to_db_row(bank: Bank) -> Dict:
+    def to_db_row(bank: Bank) -> dict:
         return {
             "name": bank.name,
             "bic": bank.bic,

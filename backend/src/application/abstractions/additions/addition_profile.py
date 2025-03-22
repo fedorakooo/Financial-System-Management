@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from src.application.dtos.addition import AdditionReadDTO, AdditionCreateDTO
 from src.application.dtos.user import UserAccessDTO
@@ -13,7 +12,7 @@ class AbstractAdditionProfileService(ABC):
             self,
             account_id: int,
             requesting_user: UserAccessDTO
-    ) -> List[AdditionReadDTO]:
+    ) -> list[AdditionReadDTO]:
         """Retrieve additions associated with the requesting account."""
         pass
 

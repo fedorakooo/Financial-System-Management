@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from src.domain.entities.addition import Addition
 
@@ -16,11 +15,11 @@ class AbstractAdditionRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_additions(self) -> List[Addition]:
+    async def get_additions(self) -> list[Addition]:
         """Fetches all additions from the repository."""
         pass
 
     @abstractmethod
-    async def get_additions_by_account_id(self, account_id: int) -> List[Addition]:
+    async def get_additions_by_account_id(self, account_id: int) -> list[Addition]:
         """Fetches all additions associated with a specific user."""
         pass

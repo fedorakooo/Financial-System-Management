@@ -16,6 +16,5 @@ class AbstractAdditionManagerRepository(ABC):
         Raises:
             UniqueConstraintError: If there is a violation of unique constraints.
             ForeignKeyError: If a foreign key constraint violation occurs.
-            InsufficientFundsError: If the new balance would result in a negative value (if applicable).
         """
         pass

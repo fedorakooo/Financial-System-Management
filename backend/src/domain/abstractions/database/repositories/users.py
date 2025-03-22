@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from src.domain.entities.user import User
 
@@ -35,7 +34,7 @@ class AbstractUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_users(self) -> List[User]:
+    async def get_users(self) -> list[User]:
         """Fetches users from the repository."""
         pass
 

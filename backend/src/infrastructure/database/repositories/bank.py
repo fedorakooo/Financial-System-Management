@@ -1,4 +1,3 @@
-from typing import List
 from asyncpg.exceptions import UniqueViolationError
 
 from src.domain.abstractions.database.connection import AbstractDatabaseConnection
@@ -24,13 +23,13 @@ class BankRepository(AbstractBankRepository):
 
         return BankDatabaseMapper.from_db_row(row)
 
-    async def get_banks(self) -> List[Bank]:
+    async def get_banks(self) -> list[Bank]:
         stmt = "SELECT * FROM banks"
 
         async with self.db_connection as conn:
             rows = await conn.fetch(stmt)
 
-            return [BankDatabaseMapper.from_db_row(row) for row in rows] if rows else []
+            return [BankDatabaseMapper.from_db_row(row) for row in rows]
 
     async def create_bank(self, bank_create: Bank) -> Bank:
         bank_create_row = BankDatabaseMapper.to_db_row(bank_create)

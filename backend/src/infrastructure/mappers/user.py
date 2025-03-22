@@ -5,7 +5,6 @@ from src.infrastructure.schemas.user import UserResponse, UserCreateRequest, Use
 class UserSchemaMapper:
     """Utility class for mapping between Data Transfer Objects (DTOs) and Pydantic models for the User entity."""
 
-    # DTO -> Pydantic
     @staticmethod
     def to_response(dto: UserReadDTO) -> UserResponse:
         return UserResponse(

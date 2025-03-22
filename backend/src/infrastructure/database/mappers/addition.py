@@ -1,5 +1,3 @@
-from typing import Dict
-
 from src.domain.entities.account import Account
 from src.domain.entities.addition import Addition
 
@@ -18,7 +16,7 @@ class AdditionDatabaseMapper:
         )
 
     @staticmethod
-    def to_db_row(addition: Addition) -> Dict:
+    def to_db_row(addition: Addition) -> dict:
         return {
             "account_id": addition.account_id,
             "amount": addition.amount,

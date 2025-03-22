@@ -1,5 +1,3 @@
-from typing import List
-
 from src.application.abstractions.accounts.account_profile import AbstractAccountProfileService
 from src.application.dtos.account import AccountReadDTO, AccountCreateDTO, AccountUpdateClientDTO
 from src.application.dtos.user import UserAccessDTO
@@ -21,7 +19,7 @@ class AccountProfileService(AbstractAccountProfileService):
         account_dto = AccountMapper.map_account_to_account_read_dto(account)
         return account_dto
 
-    async def get_accounts(self, requesting_user: UserAccessDTO) -> List[AccountReadDTO]:
+    async def get_accounts(self, requesting_user: UserAccessDTO) -> list[AccountReadDTO]:
         AccessControl.can_get_accounts(requesting_user)
         accounts = await self.repository.get_accounts_by_user_id(requesting_user.id)
         accounts_dto = [AccountMapper.map_account_to_account_read_dto(account) for account in accounts]

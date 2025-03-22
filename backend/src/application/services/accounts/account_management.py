@@ -1,5 +1,3 @@
-from typing import List
-
 from src.application.abstractions.accounts.account_management import AbstractAccountManagementService
 from src.application.dtos.account import AccountReadDTO, AccountUpdateStaffDTO
 from src.application.dtos.user import UserAccessDTO
@@ -15,7 +13,7 @@ class AccountManagementService(AbstractAccountManagementService):
     ):
         self.repository = repository
 
-    async def get_accounts_by_user_id(self, user_id: int, requesting_user: UserAccessDTO) -> List[AccountReadDTO]:
+    async def get_accounts_by_user_id(self, user_id: int, requesting_user: UserAccessDTO) -> list[AccountReadDTO]:
         AccessControl.can_get_accounts(requesting_user)
 
         accounts = await self.repository.get_accounts_by_user_id(user_id)

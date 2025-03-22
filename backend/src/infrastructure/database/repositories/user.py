@@ -1,4 +1,3 @@
-from typing import List
 from asyncpg.exceptions import UniqueViolationError
 
 from src.domain.abstractions.database.connection import AbstractDatabaseConnection
@@ -45,7 +44,7 @@ class UserRepository(AbstractUserRepository):
 
         raise NotFoundError(f"User with phone_number = {phone_number} not found")
 
-    async def get_users(self) -> List[User]:
+    async def get_users(self) -> list[User]:
         stmt = "SELECT * FROM users"
 
         async with self.db_connection as conn:

@@ -1,4 +1,3 @@
-from typing import Dict
 from src.domain.entities.user import User
 from src.domain.enums.user import UserRole
 
@@ -23,7 +22,7 @@ class UserDatabaseMapper:
         )
 
     @staticmethod
-    def to_db_row(user: User) -> Dict:
+    def to_db_row(user: User) -> dict:
         return {
             "name": user.name,
             "passport_number": user.passport_number,
