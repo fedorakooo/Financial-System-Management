@@ -1,5 +1,6 @@
 from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 
+
 class DatabaseInitializer:
     """Class responsible for initializing the database by creating all necessary tables and database objects (e.g., enums, triggers)."""
 
@@ -10,9 +11,10 @@ class DatabaseInitializer:
         """Method to call the creation of all tables"""
         await self.create_banks_table()
         await self.create_users_table()
-        await self.create_enterprise_table()
         await self.create_accounts_table()
         await self.create_additions_table()
+        await self.create_withdrawals_table()
+        await self.create_transfers_table()
 
     async def create_banks_table(self) -> None:
         create_table = """
@@ -110,57 +112,6 @@ class DatabaseInitializer:
             await conn.execute(create_function)
             await conn.execute(create_trigger)
 
-    async def create_enterprise_table(self) -> None:
-        create_enum_type = """
-            DO $$   
-            BEGIN
-                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enterprise_type') THEN
-                    CREATE TYPE enterprise_type AS ENUM ('LLC', 'SP', 'LLP');
-                END IF;
-            END $$;
-        """
-
-        create_table = """
-            CREATE TABLE IF NOT EXISTS enterprises (
-                id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                name VARCHAR(150) NOT NULL,
-                type enterprise_type NOT NULL,
-                unp VARCHAR(64) NOT NULL UNIQUE,
-                bank_id INTEGER NOT NULL REFERENCES banks(id),
-                address VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-            );
-        """
-
-        create_function = """
-            CREATE OR REPLACE FUNCTION update_enterprise_updated_at()
-            RETURNS TRIGGER AS $$
-            BEGIN
-                NEW.updated_at = now();
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-        """
-
-        create_trigger = """
-            DO $$ 
-            BEGIN
-                IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trigger_update_enterprise_updated_at') THEN
-                    CREATE TRIGGER trigger_update_enterprise_updated_at
-                    BEFORE UPDATE ON enterprises
-                    FOR EACH ROW
-                    EXECUTE FUNCTION update_enterprise_updated_at();
-                END IF;
-            END $$;
-        """
-
-        async with self.db_connection as conn:
-            await conn.execute(create_enum_type)
-            await conn.execute(create_table)
-            await conn.execute(create_function)
-            await conn.execute(create_trigger)
-
     async def create_accounts_table(self) -> None:
         create_enum_status = """
             DO $$ 
@@ -221,27 +172,90 @@ class DatabaseInitializer:
             END $$;
         """
 
-        create_enum_status = """
-            DO $$ 
-            BEGIN
-                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'addition_status') THEN
-                    CREATE TYPE addition_status AS ENUM ('PENDING', 'COMPLETED', 'FAILED');
-                END IF;
-            END $$;
-        """
-
         create_table = """
             CREATE TABLE IF NOT EXISTS additions (
                 id SERIAL PRIMARY KEY,
                 account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-                amount DECIMAL(18,2) NOT NULL CHECK (amount > 0),
+                amount DECIMAL(18,2) NOT NULL CHECK (amount >= 0),
                 source addition_source NOT NULL,
-                status addition_status NOT NULL DEFAULT 'PENDING',
                 created_at TIMESTAMP DEFAULT NOW() NOT NULL
             );
         """
 
         async with self.db_connection as conn:
             await conn.execute(create_enum_source)
+            await conn.execute(create_table)
+
+    async def create_withdrawals_table(self) -> None:
+        create_enum_source = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'withdrawal_source') THEN
+                    CREATE TYPE withdrawal_source AS ENUM ('BANK_TRANSFER', 'CARD_PAYMENT', 'CASH', 'CRYPTO', 'OTHER');
+                END IF;
+            END $$;
+        """
+
+        create_table = """
+            CREATE TABLE IF NOT EXISTS withdrawals (
+                id SERIAL PRIMARY KEY,
+                account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                amount DECIMAL(18,2) NOT NULL CHECK (amount >= 0),
+                source withdrawal_source NOT NULL,
+                created_at TIMESTAMP DEFAULT NOW() NOT NULL
+            );
+        """
+
+        async with self.db_connection as conn:
+            await conn.execute(create_enum_source)
+            await conn.execute(create_table)
+
+    async def create_transfers_table(self) -> None:
+        create_enum_status = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'transfer_status') THEN
+                    CREATE TYPE transfer_status AS ENUM ('COMPLETED', 'CANCELED');
+                END IF;
+            END $$;
+        """
+
+        create_table = """
+            CREATE TABLE IF NOT EXISTS transfers (
+                id SERIAL PRIMARY KEY,
+                from_account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                to_account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                amount DECIMAL(18,2) NOT NULL CHECK (amount > 0),
+                status transfer_status NOT NULL DEFAULT 'COMPLETED',
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP NOT NULL DEFAULT NOW() 
+            );
+        """
+
+        create_function = """
+            CREATE OR REPLACE FUNCTION update_transfer_updated_at()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.updated_at = now();
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        """
+
+        create_trigger = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trigger_update_transfer_updated_at') THEN
+                    CREATE TRIGGER trigger_update_transfer_updated_at
+                    BEFORE UPDATE ON transfers
+                    FOR EACH ROW
+                    EXECUTE FUNCTION update_transfer_updated_at();
+                END IF;
+            END $$;
+        """
+
+        async with self.db_connection as conn:
             await conn.execute(create_enum_status)
             await conn.execute(create_table)
+            await conn.execute(create_function)
+            await conn.execute(create_trigger)

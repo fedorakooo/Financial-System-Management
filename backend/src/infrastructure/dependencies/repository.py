@@ -4,6 +4,8 @@ from src.infrastructure.database.repositories.account import AccountRepository
 from src.infrastructure.database.repositories.addition import AdditionRepository
 from src.infrastructure.database.repositories.addition_manager import AdditionManagerRepository
 from src.infrastructure.database.repositories.bank import BankRepository
+from src.infrastructure.database.repositories.transfer import TransferRepository
+from src.infrastructure.database.repositories.transfer_manager import TransferManagerRepository
 from src.infrastructure.database.repositories.user import UserRepository
 from src.infrastructure.database.repositories.withdrawal import WithdrawalRepository
 from src.infrastructure.database.repositories.withdrawal_manager import WithdrawalManagerRepository
@@ -46,5 +48,15 @@ class Repositories(containers.DeclarativeContainer):
 
     withdrawal_manager_repository = providers.Factory(
         WithdrawalManagerRepository,
+        db_connection=gateways.database_connection,
+    )
+
+    transfer_repository = providers.Factory(
+        TransferRepository,
+        db_connection=gateways.database_connection,
+    )
+
+    transfer_manager_repository = providers.Factory(
+        TransferManagerRepository,
         db_connection=gateways.database_connection,
     )

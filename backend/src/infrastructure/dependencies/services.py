@@ -14,9 +14,9 @@ from src.application.services.banks.bank_public import BankPublicService
 from src.application.services.logs.log import LogService
 from src.application.services.profile.profile import ProfileService
 from src.application.services.registration.registration import UserRegistrationService
+from src.application.services.transfer.transfer_profile import TransferProfileService
 from src.application.services.users.user_management import UserManagementService
 from src.application.services.withdrawals.withdrawal_profile import WithdrawalProfileService
-from src.domain.entities.withdrawal import Withdrawal
 
 
 class Services(containers.DeclarativeContainer):
@@ -24,7 +24,6 @@ class Services(containers.DeclarativeContainer):
 
     repositories = providers.DependenciesContainer()
     core = providers.DependenciesContainer()
-    uow = providers.DependenciesContainer()
 
     log_service = providers.Factory(
         LogService,
@@ -55,7 +54,6 @@ class Services(containers.DeclarativeContainer):
     user_registration_service = providers.Factory(
         UserRegistrationService,
         repository=repositories.user_repository,
-        uow=uow.uow,
         password_handler=core.password_handler
     )
 
@@ -78,7 +76,6 @@ class Services(containers.DeclarativeContainer):
 
     profile_service = providers.Factory(
         ProfileService,
-        uow=uow.uow,
         repository=repositories.user_repository
     )
 
@@ -116,3 +113,9 @@ class Services(containers.DeclarativeContainer):
         manager_repository=repositories.withdrawal_manager_repository,
     )
 
+    transfer_profile_service = providers.Factory(
+        TransferProfileService,
+        repository=repositories.transfer_repository,
+        account_repository=repositories.account_repository,
+        manager_repository=repositories.transfer_manager_repository,
+    )
