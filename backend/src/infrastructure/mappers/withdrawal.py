@@ -16,9 +16,9 @@ class WithdrawalSchemaMapper:
         )
 
     @staticmethod
-    def from_create_request(request: WithdrawalCreateRequest) -> WithdrawalCreateDTO:
+    def from_create_request(request: WithdrawalCreateRequest, account_id: int) -> WithdrawalCreateDTO:
         return WithdrawalCreateDTO(
-            account_id=request.account_id,
+            account_id=account_id,
             amount=request.amount,
             source=request.source
         )

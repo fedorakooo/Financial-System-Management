@@ -19,7 +19,6 @@ class AbstractWithdrawalProfileService(ABC):
     @abstractmethod
     async def create_withdrawal(
             self,
-            account_id: int,
             withdrawal_create_dto: WithdrawalCreateDTO,
             requesting_user: UserAccessDTO
     ) -> WithdrawalReadDTO:

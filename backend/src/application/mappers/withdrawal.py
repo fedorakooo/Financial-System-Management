@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from src.application.dtos.withdrawal import WithdrawalCreateDTO, WithdrawalReadDTO
 from src.domain.entities.withdrawal import Withdrawal
 
@@ -8,12 +6,11 @@ class WithdrawalMapper:
     """Utility class for mapping between Withdrawal-related DTOs and domain entities."""
 
     @staticmethod
-    def map_withdrawal_create_dto_to_withdrawal(dto: WithdrawalCreateDTO, account_id) -> Withdrawal:
+    def map_withdrawal_create_dto_to_withdrawal(dto: WithdrawalCreateDTO, account_id: int) -> Withdrawal:
         return Withdrawal(
             account_id=account_id,
             amount=dto.amount,
             source=dto.source,
-            created_at=datetime.now()
         )
 
     @staticmethod

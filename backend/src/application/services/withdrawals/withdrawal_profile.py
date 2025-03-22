@@ -35,18 +35,20 @@ class WithdrawalProfileService(AbstractWithdrawalProfileService):
 
     async def create_withdrawal(
             self,
-            account_id: int,
             withdrawal_create_dto: WithdrawalCreateDTO,
             requesting_user: UserAccessDTO
     ) -> WithdrawalReadDTO:
-        account = await self.account_repository.get_account_by_id(account_id)
+        account = await self.account_repository.get_account_by_id(withdrawal_create_dto.account_id)
         AccessControl.can_create_withdrawal(account.user_id, requesting_user)
 
         new_account_balance = account.balance - withdrawal_create_dto.amount
         if new_account_balance < 0:
             raise InsufficientFundsError(account.balance)
 
-        created_withdrawal = self.manager_repository.create_withdrawal_with_balance_updates(withdrawal_create_dto, new_account_balance)
+        created_withdrawal = await self.manager_repository.create_withdrawal_with_balance_updates(
+            withdrawal_create_dto,
+            new_account_balance
+        )
 
         created_withdrawal_dto = WithdrawalMapper.map_withdrawal_to_withdrawal_read_dto(created_withdrawal)
         return created_withdrawal_dto

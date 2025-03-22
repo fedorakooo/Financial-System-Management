@@ -9,6 +9,7 @@ from src.application.dtos.user import UserAccessDTO
 from src.domain.exceptions.forbidden import ForbiddenError
 from src.infrastructure.dependencies.app import Application
 from src.infrastructure.exceptions.repository_exceptions import NotFoundError, UniqueConstraintError, ForeignKeyError
+from src.infrastructure.mappers.withdrawal import WithdrawalSchemaMapper
 from src.infrastructure.schemas.withdrawal import WithdrawalResponse, WithdrawalCreateRequest
 
 router = APIRouter(prefix="/withdrawals", tags=["Withdrawals"])
@@ -74,10 +75,10 @@ async def create_withdrawal(
         log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
 ) -> WithdrawalResponse:
     log_service.info(f"User ID {requesting_user.id} ({requesting_user.role}) is attempting to create an withdrawal")
+    withdrawal_create_dto = WithdrawalSchemaMapper.from_create_request(withdrawal_create, account_id)
     try:
         created_withdrawal = await withdrawal_profile_service.create_withdrawal(
-            account_id,
-            withdrawal_create,
+            withdrawal_create_dto,
             requesting_user
         )
         log_service.info(
@@ -99,7 +100,6 @@ async def create_withdrawal(
         )
         raise HttpExceptionFactory.create_http_exception(status.HTTP_403_FORBIDDEN, str(exc))
     except Exception as exc:
-        raise exc
         log_service.error(
             f"User ID {requesting_user.id} ({requesting_user.role}) encountered an unexpected error while creating withdrawal: {str(exc)}"
         )
