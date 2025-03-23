@@ -7,12 +7,12 @@ from src.domain.enums.addition import AdditionSource
 
 class AdditionResponse(BaseModel):
     id: int
-    amount: Decimal = Decimal("0.00")
+    amount: Decimal
     source: AdditionSource
     account_id: int
     created_at: datetime
 
 
 class AdditionCreateRequest(BaseModel):
-    amount: Decimal = Decimal("0.00")
+    amount: Decimal
     source: AdditionSource

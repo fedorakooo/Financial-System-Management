@@ -2,7 +2,6 @@ from src.application.abstractions.accounts.account_management import AbstractAcc
 from src.application.dtos.account import AccountReadDTO, AccountUpdateStaffDTO
 from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.account import AccountMapper
-from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.application.services.accounts.access_control import AccountManagementAccessControlService as AccessControl
 from src.domain.abstractions.database.uows.account import AbstractAccountUnitOfWork
 

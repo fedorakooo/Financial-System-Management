@@ -2,16 +2,18 @@ from datetime import datetime
 
 from src.application.dtos.account import AccountUpdateClientDTO, AccountCreateDTO, AccountUpdateStaffDTO, AccountReadDTO
 from src.domain.entities.account import Account
+from src.domain.enums.account import AccountType
 
 
 class AccountMapper:
     """Utility class for mapping between Account-related DTOs and domain entities."""
 
     @staticmethod
-    def map_account_create_dto_to_account(dto: AccountCreateDTO, user_id: int) -> Account:
+    def map_account_create_dto_to_account(dto: AccountCreateDTO, user_id: int, account_type: AccountType) -> Account:
         return Account(
             user_id=user_id,
             bank_id=dto.bank_id,
+            type=account_type
         )
 
     @staticmethod
@@ -22,6 +24,7 @@ class AccountMapper:
             user_id=current_account.user_id,
             balance=current_account.balance,
             status=dto.status if dto.status else current_account.status,
+            type=current_account.type,
             created_at=current_account.created_at,
             updated_at=datetime.now()
         )
@@ -35,6 +38,7 @@ class AccountMapper:
             balance=current_account.balance,
             status=dto.status if dto.status else current_account.status,
             created_at=current_account.created_at,
+            type=current_account.type,
             updated_at=datetime.now()
         )
 
@@ -46,6 +50,7 @@ class AccountMapper:
             bank_id=account.bank_id,
             balance=account.balance,
             status=account.status,
+            type=account.type,
             created_at=account.created_at,
             updated_at=account.updated_at
         )

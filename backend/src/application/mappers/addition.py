@@ -8,7 +8,7 @@ class AdditionMapper:
     """Utility class for mapping between Addition-related DTOs and domain entities."""
 
     @staticmethod
-    def map_addition_create_dto_to_addition(dto: AdditionCreateDTO, account_id) -> Addition:
+    def map_addition_create_dto_to_addition(dto: AdditionCreateDTO, account_id: int) -> Addition:
         return Addition(
             account_id=account_id,
             amount=dto.amount,

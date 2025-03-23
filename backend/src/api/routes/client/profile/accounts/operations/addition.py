@@ -9,6 +9,7 @@ from src.application.dtos.user import UserAccessDTO
 from src.domain.exceptions.forbidden import ForbiddenError
 from src.infrastructure.dependencies.app import Application
 from src.infrastructure.exceptions.repository_exceptions import NotFoundError, UniqueConstraintError, ForeignKeyError
+from src.infrastructure.mappers.addition import AdditionSchemaMapper
 from src.infrastructure.schemas.addition import AdditionResponse, AdditionCreateRequest
 
 router = APIRouter(prefix="/additions", tags=["Additions"])
@@ -30,7 +31,7 @@ async def get_additions_by_account_id(
 ) -> list[AdditionResponse]:
     try:
         log_service.info(f"User ID {requesting_user.id} ({requesting_user.role}) is fetching additions")
-        fetched_additions = await addition_profile_service.get_additions_by_account_id(
+        fetched_additions_dto = await addition_profile_service.get_additions_by_account_id(
             account_id,
             requesting_user
         )
@@ -53,6 +54,7 @@ async def get_additions_by_account_id(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             "An unexpected error occurred while fetching the list of additions."
         )
+    fetched_additions = [AdditionSchemaMapper.to_response(fetched_addition_dto) for fetched_addition_dto in fetched_additions_dto]
     return fetched_additions
 
 

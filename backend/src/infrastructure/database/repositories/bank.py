@@ -1,8 +1,6 @@
 from typing import Any
-
 from asyncpg.exceptions import UniqueViolationError
 
-from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 from src.domain.abstractions.database.repositories.banks import AbstractBankRepository
 from src.domain.entities.bank import Bank
 from src.infrastructure.exceptions.repository_exceptions import NotFoundError, NoFieldsToUpdateError
@@ -27,10 +25,9 @@ class BankRepository(AbstractBankRepository):
     async def get_banks(self) -> list[Bank]:
         stmt = "SELECT * FROM banks"
 
-        async with self.db_connection as conn:
-            rows = await conn.fetch(stmt)
+        rows = await self.connection.fetch(stmt)
 
-            return [BankDatabaseMapper.from_db_row(row) for row in rows]
+        return [BankDatabaseMapper.from_db_row(row) for row in rows]
 
     async def create_bank(self, bank_create: Bank) -> Bank:
         bank_create_row = BankDatabaseMapper.to_db_row(bank_create)
@@ -42,8 +39,7 @@ class BankRepository(AbstractBankRepository):
         stmt = f"INSERT INTO banks ({columns}) VALUES ({placeholders}) RETURNING *"
 
         try:
-            async with self.db_connection as conn:
-                row = await conn.fetchrow(stmt, *values)
+            row = await self.connection.fetchrow(stmt, *values)
         except UniqueViolationError as exc:
             raise ErrorHandler.handle_unique_violation("Bank", exc, bank_create)
 
@@ -57,8 +53,7 @@ class BankRepository(AbstractBankRepository):
         stmt = f"UPDATE banks SET {columns} WHERE id = ${len(values)} RETURNING *"
 
         try:
-            async with self.db_connection as conn:
-                row = await conn.fetchrow(stmt, *values)
+            row = await self.connection.fetchrow(stmt, *values)
         except UniqueViolationError as exc:
             raise ErrorHandler.handle_unique_violation("Bank", exc, bank_update)
 
@@ -70,8 +65,7 @@ class BankRepository(AbstractBankRepository):
     async def delete_bank_by_id(self, bank_id: int) -> None:
         stmt = "DELETE FROM banks WHERE id = $1"
 
-        async with self.db_connection as conn:
-            result = await conn.execute(stmt, bank_id)
+        result = await self.connection.execute(stmt, bank_id)
 
         if result == "DELETE 0":
             raise NotFoundError(f"Bank with id = {bank_id} not found")

@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from src.domain.enums.account import AccountStatus
+from src.domain.enums.account import AccountStatus, AccountType
 
 
 @dataclass(frozen=True)
@@ -13,6 +13,7 @@ class AccountReadDTO:
     bank_id: int
     balance: Decimal
     status: AccountStatus
+    type: AccountType
     created_at: datetime
     updated_at: datetime
 

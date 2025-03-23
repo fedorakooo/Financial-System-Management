@@ -7,10 +7,7 @@ from src.domain.abstractions.database.uows.addition import AbstractAdditionUnitO
 
 
 class AdditionProfileService(AbstractAdditionProfileService):
-    def __init__(
-            self,
-            uow: AbstractAdditionUnitOfWork
-    ):
+    def __init__(self, uow: AbstractAdditionUnitOfWork):
         self.uow = uow
 
     async def get_additions_by_account_id(

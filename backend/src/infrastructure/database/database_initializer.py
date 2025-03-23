@@ -123,6 +123,15 @@ class DatabaseInitializer:
             END $$;
         """
 
+        create_enum_type = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account_type') THEN
+                    CREATE TYPE account_type AS ENUM ('SALARY', 'DEPOSIT', 'LOAN', 'SETTLEMENT');
+                END IF;
+            END $$;
+        """
+
         create_table = """
             CREATE TABLE IF NOT EXISTS accounts (
                 id SERIAL PRIMARY KEY,
@@ -130,6 +139,7 @@ class DatabaseInitializer:
                 bank_id INTEGER NOT NULL REFERENCES banks(id),
                 balance DECIMAL(30,2) NOT NULL CHECK (balance >= 0) DEFAULT 0,
                 status account_status NOT NULL DEFAULT 'ON_CONSIDERATION',
+                type account_type NOT NULL,
                 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
@@ -159,6 +169,7 @@ class DatabaseInitializer:
 
         async with self.db_connection as conn:
             await conn.execute(create_enum_status)
+            await conn.execute(create_enum_type)
             await conn.execute(create_table)
             await conn.execute(create_function)
             await conn.execute(create_trigger)

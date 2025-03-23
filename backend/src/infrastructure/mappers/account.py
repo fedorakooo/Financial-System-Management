@@ -13,6 +13,7 @@ class AccountSchemaMapper:
             bank_id=dto.bank_id,
             balance=dto.balance,
             status=dto.status,
+            type=dto.type,
             created_at=dto.created_at,
             updated_at=dto.updated_at
         )

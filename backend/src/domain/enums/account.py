@@ -7,3 +7,10 @@ class AccountStatus(Enum):
     FROZEN = 'FROZEN'
     ON_CONSIDERATION = 'ON_CONSIDERATION'
     CANCELLED = 'CANCELLED'
+
+
+class AccountType(Enum):
+    SALARY = "SALARY"
+    DEPOSIT = "DEPOSIT"
+    SETTLEMENT = "SETTLEMENT"
+    LOAN = "LOAN"

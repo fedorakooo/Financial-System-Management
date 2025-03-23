@@ -2,16 +2,12 @@ from src.application.abstractions.accounts.account_profile import AbstractAccoun
 from src.application.dtos.account import AccountReadDTO, AccountCreateDTO, AccountUpdateClientDTO
 from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.account import AccountMapper
-from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.application.services.accounts.access_control import AccountProfileAccessControlService as AccessControl
 from src.domain.abstractions.database.uows.account import AbstractAccountUnitOfWork
 
 
 class AccountProfileService(AbstractAccountProfileService):
-    def __init__(
-            self,
-            uow: AbstractAccountUnitOfWork
-    ):
+    def __init__(self, uow: AbstractAccountUnitOfWork):
         self.uow = uow
 
     async def get_account_by_id(self, account_id: int, requesting_user: UserAccessDTO) -> AccountReadDTO:
@@ -34,7 +30,11 @@ class AccountProfileService(AbstractAccountProfileService):
             requesting_user: UserAccessDTO
     ) -> AccountReadDTO:
         AccessControl.can_create_account(requesting_user)
-        account_create = AccountMapper.map_account_create_dto_to_account(account_create_dto, requesting_user.id)
+        account_create = AccountMapper.map_account_create_dto_to_account(
+            account_create_dto,
+            requesting_user.id,
+            AccountType.SETTLEMENT
+        )
         async with self.uow as uow:
             created_account = await self.uow.account_repository.create_account(account_create)
         created_account_dto = AccountMapper.map_account_to_account_read_dto(created_account)
