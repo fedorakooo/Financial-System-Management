@@ -20,6 +20,10 @@ class AbstractAdditionRepository(ABC):
         pass
 
     @abstractmethod
+    async def create_addition(self, addition_create: Addition) -> dict:
+        pass
+
+    @abstractmethod
     async def get_additions_by_account_id(self, account_id: int) -> list[Addition]:
         """Fetches all additions associated with a specific user."""
         pass

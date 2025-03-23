@@ -1,3 +1,5 @@
+from typing import Any
+
 from asyncpg.exceptions import UniqueViolationError
 
 from src.domain.abstractions.database.connection import AbstractDatabaseConnection
@@ -9,14 +11,13 @@ from src.infrastructure.database.handlers.error_handler import ErrorHandler
 
 
 class BankRepository(AbstractBankRepository):
-    def __init__(self, db_connection: AbstractDatabaseConnection):
-        self.db_connection: AbstractDatabaseConnection = db_connection
+    def __init__(self, connection: Any):
+        self.connection = connection
 
     async def get_bank_by_id(self, bank_id: int) -> Bank:
         stmt = "SELECT * FROM banks WHERE id = $1"
 
-        async with self.db_connection as conn:
-            row = await conn.fetchrow(stmt, bank_id)
+        row = await self.connection.fetchrow(stmt, bank_id)
 
         if row is None:
             raise NotFoundError(f"Bank with id = {bank_id} not found")

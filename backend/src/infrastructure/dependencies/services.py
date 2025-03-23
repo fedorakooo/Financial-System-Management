@@ -24,6 +24,7 @@ class Services(containers.DeclarativeContainer):
 
     repositories = providers.DependenciesContainer()
     core = providers.DependenciesContainer()
+    uow = providers.DependenciesContainer()
 
     log_service = providers.Factory(
         LogService,
@@ -59,7 +60,7 @@ class Services(containers.DeclarativeContainer):
 
     auth_user_service = providers.Factory(
         AuthUserService,
-        repository=repositories.user_repository,
+        uow=uow.user_unit_of_work,
     )
 
     login_service = providers.Factory(
@@ -71,51 +72,45 @@ class Services(containers.DeclarativeContainer):
 
     bank_info_service = providers.Factory(
         BankPublicService,
-        repository=repositories.bank_repository
+        uow=uow.bank_unit_of_work,
     )
 
     profile_service = providers.Factory(
         ProfileService,
-        repository=repositories.user_repository
+        uow=uow.user_unit_of_work,
     )
 
     account_profile_service = providers.Factory(
         AccountProfileService,
-        repository=repositories.account_repository,
+        uow=uow.account_unit_of_work,
     )
 
     addition_profile_service = providers.Factory(
         AdditionProfileService,
-        repository=repositories.addition_repository,
-        account_repository=repositories.account_repository,
-        manager_repository=repositories.addition_manager_repository,
+        uow=uow.addition_unit_of_work,
     )
 
     bank_management_service = providers.Factory(
         BankManagementService,
-        repository=repositories.bank_repository,
+        uow=uow.bank_unit_of_work,
     )
 
     user_management_service = providers.Factory(
         UserManagementService,
-        repository=repositories.user_repository,
+        uow=uow.user_unit_of_work,
     )
 
     account_management_service = providers.Factory(
         AccountManagementService,
-        repository=repositories.account_repository,
+        uow=uow.account_unit_of_work,
     )
 
     withdrawal_profile_service = providers.Factory(
         WithdrawalProfileService,
-        repository=repositories.withdrawal_repository,
-        account_repository=repositories.account_repository,
-        manager_repository=repositories.withdrawal_manager_repository,
+        uow=uow.withdrawal_unit_of_work,
     )
 
     transfer_profile_service = providers.Factory(
         TransferProfileService,
-        repository=repositories.transfer_repository,
-        account_repository=repositories.account_repository,
-        manager_repository=repositories.transfer_manager_repository,
+        uow=uow.transfer_unit_of_work,
     )

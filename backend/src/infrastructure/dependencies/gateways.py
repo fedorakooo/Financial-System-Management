@@ -2,6 +2,7 @@ from dependency_injector import containers, providers
 
 from src.infrastructure.database.connection import DatabaseConnection
 from src.infrastructure.database.database_initializer import DatabaseInitializer
+from src.infrastructure.database.factories.repository_factory import RepositoryFactory
 
 
 class Gateways(containers.DeclarativeContainer):
@@ -18,4 +19,8 @@ class Gateways(containers.DeclarativeContainer):
     database_initializer = providers.Factory(
         DatabaseInitializer,
         db_connection=database_connection,
+    )
+
+    repository_factory = providers.Factory(
+        RepositoryFactory,
     )

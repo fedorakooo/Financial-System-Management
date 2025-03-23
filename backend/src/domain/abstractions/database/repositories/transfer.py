@@ -18,3 +18,7 @@ class AbstractTransferRepository(ABC):
     async def get_transfers_by_account_id(self, account_id: int) -> list[Transfer]:
         """Fetches all transfers associated with a specific user."""
         pass
+
+    @abstractmethod
+    async def create_transfer(self, transfer_create: Transfer) -> Transfer:
+        pass

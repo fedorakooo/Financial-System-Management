@@ -1,4 +1,5 @@
-from src.domain.abstractions.database.connection import AbstractDatabaseConnection
+from typing import Any
+
 from src.domain.abstractions.database.repositories.transfer import AbstractTransferRepository
 from src.domain.entities.transfer import Transfer
 from src.infrastructure.database.mappers.transfer import TransferDatabaseMapper
@@ -6,14 +7,13 @@ from src.infrastructure.exceptions.repository_exceptions import NotFoundError
 
 
 class TransferRepository(AbstractTransferRepository):
-    def __init__(self, db_connection: AbstractDatabaseConnection):
-        self.db_connection: AbstractDatabaseConnection = db_connection
+    def __init__(self, connection: Any):
+        self.connection = connection
 
     async def get_transfer_by_id(self, transfer_id: int) -> Transfer:
         stmt = "SELECT * FROM transfers WHERE id = $1"
 
-        async with self.db_connection as conn:
-            row = await conn.fetchrow(stmt, transfer_id)
+        row = await self.connection.fetchrow(stmt, transfer_id)
 
         if row:
             return TransferDatabaseMapper.from_db_row(row)
@@ -23,7 +23,19 @@ class TransferRepository(AbstractTransferRepository):
     async def get_transfers_by_account_id(self, account_id: int) -> list[Transfer]:
         stmt = "SELECT * FROM transfers WHERE from_account_id = $1 OR to_account_id = $1"
 
-        async with self.db_connection as conn:
-            rows = await conn.fetch(stmt, account_id)
+        rows = await self.connection.fetch(stmt, account_id)
 
         return [TransferDatabaseMapper.from_db_row(row) for row in rows]
+
+    async def create_transfer(self, transfer_create: Transfer) -> Transfer:
+        transfer_create_row = TransferDatabaseMapper.to_db_row(transfer_create)
+
+        columns = ', '.join(transfer_create_row.keys())
+        placeholders = ', '.join([f"${i + 1}" for i in range(len(transfer_create_row))])
+        values = tuple(transfer_create_row.values())
+
+        stmt = f"INSERT INTO additions ({columns}) VALUES ({placeholders}) RETURNING *"
+
+        row = self.connection.fetchrow(stmt, *values)
+
+        return TransferDatabaseMapper.from_db_row(row)

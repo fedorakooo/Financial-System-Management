@@ -2,8 +2,8 @@ from dependency_injector import containers, providers
 
 from src.infrastructure.dependencies.core import Core
 from src.infrastructure.dependencies.gateways import Gateways
-from src.infrastructure.dependencies.repository import Repositories
 from src.infrastructure.dependencies.services import Services
+from src.infrastructure.dependencies.uow import UnitOfWork
 
 
 class Application(containers.DeclarativeContainer):
@@ -24,15 +24,14 @@ class Application(containers.DeclarativeContainer):
         core=core,
     )
 
-    repositories = providers.Container(
-        Repositories,
-        config=config.repository,
+    uow = providers.Container(
+        UnitOfWork,
         gateways=gateways,
     )
 
     services = providers.Container(
         Services,
         config=config.services,
-        repositories=repositories,
+        uow=uow,
         core=core,
     )

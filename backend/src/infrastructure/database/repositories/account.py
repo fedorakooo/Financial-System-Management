@@ -1,6 +1,7 @@
+from decimal import Decimal
+from typing import Any
 from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 
-from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.domain.entities.account import Account
 from src.infrastructure.database.handlers.error_handler import ErrorHandler
@@ -9,14 +10,13 @@ from src.infrastructure.exceptions.repository_exceptions import NotFoundError
 
 
 class AccountRepository(AbstractAccountRepository):
-    def __init__(self, db_connection: AbstractDatabaseConnection):
-        self.db_connection: AbstractDatabaseConnection = db_connection
+    def __init__(self, db_connection: Any):
+        self.connection = db_connection
 
     async def get_account_by_id(self, account_id) -> Account:
         stmt = "SELECT * FROM accounts WHERE id = $1"
 
-        async with self.db_connection as conn:
-            row = await conn.fetchrow(stmt, account_id)
+        row = await self.connection.fetchrow(stmt, account_id)
 
         if row:
             return AccountDatabaseMapper.from_db_row(row)
@@ -26,8 +26,7 @@ class AccountRepository(AbstractAccountRepository):
     async def get_accounts_by_user_id(self, user_id) -> list[Account]:
         stmt = "SELECT * FROM accounts WHERE user_id = $1"
 
-        async with self.db_connection as conn:
-            rows = await conn.fetch(stmt, user_id)
+        rows = await self.connection.fetch(stmt, user_id)
 
         return [AccountDatabaseMapper.from_db_row(row) for row in rows] if rows else []
 
@@ -41,9 +40,7 @@ class AccountRepository(AbstractAccountRepository):
         stmt = f"INSERT INTO accounts ({columns}) VALUES ({placeholders}) RETURNING *"
 
         try:
-            async with self.db_connection as conn:
-                print(values)
-                row = await conn.fetchrow(stmt, *values)
+            row = await self.connection.fetchrow(stmt, *values)
         except UniqueViolationError as exc:
             raise ErrorHandler.handle_unique_violation("Account", exc, account_create)
         except ForeignKeyViolationError as exc:
@@ -56,12 +53,10 @@ class AccountRepository(AbstractAccountRepository):
 
         columns = ', '.join([f"{key} = ${i + 1}" for i, key in enumerate(account_update_row.keys())])
         values = tuple(account_update_row.values()) + (account_id,)
-        print(account_update_row)
         stmt = f"UPDATE accounts SET {columns} WHERE id = ${len(values)} RETURNING *"
 
         try:
-            async with self.db_connection as conn:
-                row = await conn.fetchrow(stmt, *values)
+            row = await self.connection.fetchrow(stmt, *values)
         except UniqueViolationError as exc:
             raise ErrorHandler.handle_unique_violation("Account", exc, account_update)
 
@@ -70,11 +65,17 @@ class AccountRepository(AbstractAccountRepository):
 
         raise NotFoundError(f"Account with id {account_id} not found")
 
+    async def update_account_balance(self, account_id: int, new_balance: Decimal) -> None:
+        stmt = "UPDATE accounts SET balance = $2 WHERE id = $1"
+
+        await self.connection.execute(stmt, account_id, new_balance)
+
+
     async def delete_account_by_id(self, account_id: int) -> None:
         stmt = "DELETE FROM accounts WHERE id = $1"
 
-        async with self.db_connection as conn:
-            result = await conn.execute(stmt, account_id)
+        result = await self.connection.execute(stmt, account_id)
 
         if result == "DELETE 0":
             raise NotFoundError(f"Account with id {account_id} not found")
+

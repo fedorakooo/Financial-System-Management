@@ -3,21 +3,24 @@ from src.application.dtos.user import UserAccessDTO, UserReadDTO, UserUpdateDTO
 from src.application.mappers.user import UserMapper
 from src.domain.abstractions.database.repositories.users import AbstractUserRepository
 from src.application.services.users.access_control import UserManagementAccessControlService as AccessControl
+from src.domain.abstractions.database.uows.user import AbstractUserUnitOfWork
 
 
 class UserManagementService(AbstractUserManagementService):
-    def __init__(self, repository: AbstractUserRepository):
-        self.repository = repository
+    def __init__(self, uow: AbstractUserUnitOfWork):
+        self.uow = uow
 
     async def get_user_by_id(self, user_id: int, requesting_user: UserAccessDTO) -> UserReadDTO:
         AccessControl.can_get_users(requesting_user)
-        user = await self.repository.get_user_by_id(user_id)
+        async with self.uow as uow:
+            user = await self.uow.user_repository.get_user_by_id(user_id)
         user_dto = UserMapper.map_user_to_user_read_dto(user)
         return user_dto
 
     async def get_all_users(self, requesting_user: UserAccessDTO) -> list[UserReadDTO]:
         AccessControl.can_get_users(requesting_user)
-        users = await self.repository.get_users()
+        async with self.uow as uow:
+            users = await uow.user_repository.get_users()
         users_dto = [UserMapper.map_user_to_user_read_dto(user) for user in users]
         return users_dto
 
@@ -29,10 +32,11 @@ class UserManagementService(AbstractUserManagementService):
     ) -> UserReadDTO:
         AccessControl.can_update_user(requesting_user)
 
-        current_user = await self.repository.get_user_by_id(user_id)
-        user_update = UserMapper.map_user_update_dto_to_user(user_update_dto, current_user)
+        async with self.uow as uow:
+            current_user = await uow.user_repository.get_user_by_id(user_id)
+            user_update = UserMapper.map_user_update_dto_to_user(user_update_dto, current_user)
 
-        updated_user = await self.repository.update_user_by_id(user_id, user_update)
+            updated_user = await uow.user_repository.update_user_by_id(user_id, user_update)
 
         updated_user_dto = UserMapper.map_user_to_user_read_dto(updated_user)
         return updated_user_dto
@@ -40,4 +44,5 @@ class UserManagementService(AbstractUserManagementService):
     async def delete_user_by_id(self, user_id: int, requesting_user: UserAccessDTO) -> None:
         AccessControl.can_delete_user(requesting_user)
 
-        await self.repository.delete_user_by_id(user_id)
+        async with self.uow as uow:
+            await uow.user_repository.delete_user_by_id(user_id)

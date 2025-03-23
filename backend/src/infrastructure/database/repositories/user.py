@@ -1,6 +1,6 @@
+from typing import Any
 from asyncpg.exceptions import UniqueViolationError
 
-from src.domain.abstractions.database.connection import AbstractDatabaseConnection
 from src.domain.abstractions.database.repositories.users import AbstractUserRepository
 from src.domain.entities.user import User
 from src.infrastructure.exceptions.repository_exceptions import NotFoundError
@@ -9,14 +9,13 @@ from src.infrastructure.database.handlers.error_handler import ErrorHandler
 
 
 class UserRepository(AbstractUserRepository):
-    def __init__(self, db_connection: AbstractDatabaseConnection):
-        self.db_connection: AbstractDatabaseConnection = db_connection
+    def __init__(self, connection: Any):
+        self.connection = connection
 
     async def get_user_by_id(self, user_id: int) -> User:
         stmt = "SELECT * FROM users WHERE id = $1"
 
-        async with self.db_connection as conn:
-            row = await conn.fetchrow(stmt, user_id)
+        row = await self.connection.fetchrow(stmt, user_id)
 
         if row:
             return UserDatabaseMapper.from_db_row(row)
@@ -26,8 +25,8 @@ class UserRepository(AbstractUserRepository):
     async def get_user_by_phone_number(self, phone_number: str) -> User:
         stmt = "SELECT * FROM users WHERE phone_number = $1"
 
-        async with self.db_connection as conn:
-            row = await conn.fetchrow(stmt, phone_number)
+        row = await self.connection.fetchrow(stmt, phone_number)
+
         if row:
             return UserDatabaseMapper.from_db_row(row)
 
@@ -36,8 +35,7 @@ class UserRepository(AbstractUserRepository):
     async def get_user_hashed_password_by_phone_number(self, phone_number: str) -> str:
         stmt = "SELECT hashed_password FROM users WHERE phone_number = $1"
 
-        async with self.db_connection as conn:
-            row = await conn.fetchrow(stmt, phone_number)
+        row = await self.connection.fetchrow(stmt, phone_number)
 
         if row:
             return row['hashed_password']
@@ -47,8 +45,7 @@ class UserRepository(AbstractUserRepository):
     async def get_users(self) -> list[User]:
         stmt = "SELECT * FROM users"
 
-        async with self.db_connection as conn:
-            rows = await conn.fetch(stmt)
+        rows = await self.connection.fetch(stmt)
 
         return [UserDatabaseMapper.from_db_row(row) for row in rows] if rows else []
 
@@ -62,8 +59,7 @@ class UserRepository(AbstractUserRepository):
         stmt = f"INSERT INTO users ({columns}) VALUES ({placeholders}) RETURNING *"
 
         try:
-            async with self.db_connection as conn:
-                row = await conn.fetchrow(stmt, *values)
+            row = await self.connection.fetchrow(stmt, *values)
         except UniqueViolationError as exc:
             raise ErrorHandler.handle_unique_violation("User", exc, user_create)
 
@@ -77,8 +73,7 @@ class UserRepository(AbstractUserRepository):
         stmt = f"UPDATE users SET {columns} WHERE id = ${len(values)} RETURNING *"
 
         try:
-            async with self.db_connection as conn:
-                row = await conn.fetchrow(stmt, *values)
+            row = await self.connection.fetchrow(stmt, *values)
         except UniqueViolationError as exc:
             raise ErrorHandler.handle_unique_violation("User", exc, user_update)
 
@@ -90,8 +85,7 @@ class UserRepository(AbstractUserRepository):
     async def delete_user_by_id(self, user_id: int) -> None:
         stmt = "DELETE FROM users WHERE id = $1"
 
-        async with self.db_connection as conn:
-            result = await conn.execute(stmt, user_id)
+        result = await self.connection.execute(stmt, user_id)
 
         if result == "DELETE 0":
             raise NotFoundError(f"User with id = {user_id} not found")

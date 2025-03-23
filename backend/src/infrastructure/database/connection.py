@@ -50,19 +50,5 @@ class DatabaseConnection(AbstractDatabaseConnection):
         await self.connect()
         return self
 
-    async def __aenter__(self):
-        """Set up the context manager by establishing a connection and starting a transaction."""
-        await self.connect()
-        self._transaction = self.connection.transaction()  # Создаем транзакцию
-        await self._transaction.start()  # Начинаем транзакцию
-        return self
-
     async def __aexit__(self, exc_type, exc, tb):
-        """Clean up by committing or rolling back the transaction and closing the connection."""
-        if self._transaction:
-            if exc_type is None:
-                await self._transaction.commit()
-            else:
-                await self._transaction.rollback()
-            self._transaction = None
-        await self.close()
+        await self.connection.close()

@@ -16,6 +16,7 @@ class DatabaseInitializer:
         await self.create_withdrawals_table()
         await self.create_transfers_table()
 
+
     async def create_banks_table(self) -> None:
         create_table = """
             CREATE TABLE IF NOT EXISTS banks (
