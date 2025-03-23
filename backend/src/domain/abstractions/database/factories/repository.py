@@ -33,3 +33,7 @@ class AbstractRepositoryFactory(ABC):
     @abstractmethod
     def create_withdrawal_repository(self, connection) -> AbstractWithdrawalRepository:
         pass
+
+    @abstractmethod
+    def create_loan_repository(self, connection) -> AbstractLoanRepository:
+        pass

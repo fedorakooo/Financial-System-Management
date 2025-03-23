@@ -3,6 +3,7 @@ from dependency_injector import containers, providers
 from src.infrastructure.database.uows.account import AccountUnitOfWork
 from src.infrastructure.database.uows.addition import AdditionUnitOfWork
 from src.infrastructure.database.uows.bank import BankUnitOfWork
+from src.infrastructure.database.uows.loan import LoanUnitOfWork
 from src.infrastructure.database.uows.transfer import TransferUnitOfWork
 from src.infrastructure.database.uows.user import UserUnitOfWork
 from src.infrastructure.database.uows.withdrawal import WithdrawalUnitOfWork
@@ -43,6 +44,12 @@ class UnitOfWork(containers.DeclarativeContainer):
 
     transfer_unit_of_work = providers.Factory(
         TransferUnitOfWork,
+        db_connection=gateways.database_connection,
+        repository_factory=gateways.repository_factory,
+    )
+
+    loan_unit_of_work = providers.Factory(
+        LoanUnitOfWork,
         db_connection=gateways.database_connection,
         repository_factory=gateways.repository_factory,
     )

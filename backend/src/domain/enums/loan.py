@@ -3,8 +3,9 @@ from enum import Enum
 
 class LoanStatus(Enum):
     PENDING = 'PENDING'
-    APPROVED = 'APPROVED'
+    ACTIVE = 'ACTIVE'
     REJECTED = 'REJECTED'
+    COMPLETED = 'COMPLETED'
 
 
 class LoanTermMonths(Enum):
@@ -14,3 +15,7 @@ class LoanTermMonths(Enum):
     TWENTY_FOUR = 24
     THIRTY_SIX = 36
     FORTY_EIGHT = 48
+
+class LoanTransactionType(Enum):
+    CREDIT = 'CREDIT'
+    PAYMENT = 'PAYMENT'

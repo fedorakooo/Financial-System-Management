@@ -1,0 +1,34 @@
+from abc import ABC, abstractmethod
+
+from src.application.dtos.loan import (
+    LoanAccountReadDTO,
+    LoanCreateDTO,
+    LoanReadDTO,
+    LoanTransactionCreateDTO,
+    LoanTransactionReadDTO
+)
+from src.application.dtos.user import UserAccessDTO
+
+
+class AbstractLoanProfileService(ABC):
+    """Abstract service for managing user loans."""
+
+    @abstractmethod
+    async def get_loan_account_by_id(
+            self,
+            loan_account_id: int,
+            requesting_user: UserAccessDTO
+    ) -> list[LoanAccountReadDTO]:
+        pass
+
+    @abstractmethod
+    async def create_loan_request(
+            self,
+            loan_create_dto: LoanCreateDTO,
+            requesting_user: UserAccessDTO
+    ) -> LoanReadDTO:
+        pass
+
+    @abstractmethod
+    async def create_loan_transaction(self, loan_transaction: LoanTransactionCreateDTO) -> LoanTransactionReadDTO:
+        pass
