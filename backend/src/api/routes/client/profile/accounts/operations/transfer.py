@@ -31,7 +31,7 @@ async def get_transfers_by_account_id(
 ) -> list[TransferResponse]:
     try:
         log_service.info(f"User ID {requesting_user.id} ({requesting_user.role}) is fetching transfers")
-        fetched_transfers = await transfer_profile_service.get_transfers_by_account_id(
+        fetched_transfers_dto = await transfer_profile_service.get_transfers_by_account_id(
             account_id,
             requesting_user
         )
@@ -54,6 +54,7 @@ async def get_transfers_by_account_id(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             "An unexpected error occurred while fetching the list of transfers."
         )
+    fetched_transfers = [TransferSchemaMapper.to_response(fetched_transfer_dto) for fetched_transfer_dto in fetched_transfers_dto]
     return fetched_transfers
 
 
