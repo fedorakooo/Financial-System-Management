@@ -19,7 +19,7 @@ class AccountSchemaMapper:
         )
 
     @staticmethod
-    def from_create_request(request: AccountCreateRequest, user_id) -> AccountCreateDTO:
+    def from_create_request(request: AccountCreateRequest, user_id: int) -> AccountCreateDTO:
         return AccountCreateDTO(
             user_id=user_id,
             bank_id=request.bank_id,

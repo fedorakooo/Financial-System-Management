@@ -10,11 +10,14 @@ from src.infrastructure.dependencies.app import Application
 from src.infrastructure.exceptions.repository_exceptions import UniqueConstraintError, ForeignKeyError, NotFoundError
 from src.infrastructure.schemas.account import AccountResponse, AccountCreateRequest
 
+from src.api.routes.staff.accounts.operation.loan import router as loan_router
+
 router = APIRouter(prefix="/accounts", tags=["Accounts Management"])
+router.include_router(loan_router)
 
 
 @router.get("/", response_model=list[AccountResponse], responses={
-    401: {"description": "Invalid or expired token" },
+    401: {"description": "Invalid or expired token"},
     403: {"description": "User is inactive or lacks required role to access this resource"},
     500: {"description": "Unexpected server error"}
 })
@@ -43,53 +46,6 @@ async def get_user_accounts(
             detail="An unexpected error occurred while fetching the list of accounts."
         )
     return accounts
-
-
-@router.post("/", response_model=AccountResponse, responses={
-    401: {"description": "Invalid or expired token"},
-    403: {"description": "User is inactive"},
-    409: {"description": "Conflict due to a unique constraint violation"},
-    500: {"description": "Unexpected server error"}
-})
-@inject
-async def create_account(
-        account_create: AccountCreateRequest,
-        requesting_user: UserAccessDTO = Depends(get_current_active_auth_user),
-        account_management_service: AbstractAccountManagementService = Depends(
-            Provide[Application.services.account_management_service]
-        ),
-        log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
-) -> AccountResponse:
-    log_service.info(f"Creating account with Bank ID {account_create.bank_id}")
-    try:
-        created_account = await account_management_service.create(account_create, requesting_user.id, requesting_user.role)
-        log_service.info(
-            f"Account with Bank ID {created_account.bank_id} and ID {created_account.id} successfully created")
-    except UniqueConstraintError as exc:
-        log_service.error(
-            f"Unique constraint violation while creating the account with Bank ID {account_create.bank_id}: {str(exc)}"
-        )
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(exc)
-        )
-    except ForeignKeyError as exc:
-        log_service.error(
-            f"Foreign key constraint violation while creating the account with Bank ID {account_create.bank_id}: {str(exc)}"
-        )
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc)
-        )
-    except Exception as exc:
-        log_service.error(
-            f"An unexpected error occurred while creating the account with Bank ID {account_create.bank_id}: {str(exc)}"
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while creating the account."
-        )
-    return created_account
 
 
 @router.delete("/{account_id}", status_code=status.HTTP_204_NO_CONTENT, responses={

@@ -36,6 +36,6 @@ class BankUnitOfWork(AbstractBankUnitOfWork):
     @property
     def bank_repository(self) -> AbstractBankRepository:
         """Return the bank repository."""
-        if self._user_repository is None:
+        if self._bank_repository is None:
             raise RuntimeError("Bank repository is not initialized. Use the context manager.")
-        return self._user_repository
+        return self._bank_repository

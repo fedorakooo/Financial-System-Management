@@ -25,5 +25,6 @@ class AccountDatabaseMapper:
         return {
             "bank_id": account.bank_id,
             "status": account.status.value,
+            "type": account.type.value,
             "user_id": account.user_id
         }
