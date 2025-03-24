@@ -15,6 +15,7 @@ class DatabaseInitializer:
         await self.create_additions_table()
         await self.create_withdrawals_table()
         await self.create_transfers_table()
+        await self.create_loans_table()
 
 
     async def create_banks_table(self) -> None:
@@ -269,5 +270,87 @@ class DatabaseInitializer:
         async with self.db_connection as conn:
             await conn.execute(create_enum_status)
             await conn.execute(create_table)
+            await conn.execute(create_function)
+            await conn.execute(create_trigger)
+
+
+    async def create_loans_table(self) -> None:
+        create_enum_loan_transaction_type = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'loan_transaction_type') THEN
+                    CREATE TYPE loan_transaction_type AS ENUM ('CREDIT', 'PAYMENT');
+                END IF;
+            END $$;
+        """
+
+        create_enum_loan_status_type = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'loan_status_type') THEN
+                    CREATE TYPE loan_status_type AS ENUM ('PENDING', 'ACTIVE', 'REJECTED', 'COMPLETED');
+                END IF;
+            END $$;
+        """
+
+        create_loans_table = """
+            CREATE TABLE IF NOT EXISTS loans (
+                id SERIAL PRIMARY KEY,
+                amount DECIMAL(18,2) NOT NULL,
+                term_months BIGINT,
+                interest_rate DECIMAL(5,2) NOT NULL,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP NOT NULL DEFAULT NOW()
+            );
+        """
+
+        create_loan_accounts_table = """
+            CREATE TABLE IF NOT EXISTS loan_accounts (
+                id SERIAL PRIMARY KEY,
+                account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                loan_id BIGINT NOT NULL REFERENCES loans(id) ON DELETE CASCADE,
+                user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                status loan_status_type NOT NULL
+            );
+        """
+
+        create_loan_transactions_table = """
+            CREATE TABLE IF NOT EXISTS loan_transactions (
+                id SERIAL PRIMARY KEY,
+                loan_account_id BIGINT NOT NULL REFERENCES loan_accounts(id) ON DELETE CASCADE,
+                type loan_transaction_type NOT NULL,
+                amount DECIMAL(18 ,2) NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT NOW()
+            );
+        """
+
+        create_trigger = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trigger_update_loan_updated_at') THEN
+                    CREATE TRIGGER trigger_update_loan_updated_at
+                    BEFORE UPDATE ON loans
+                    FOR EACH ROW
+                    EXECUTE FUNCTION update_loan_updated_at();
+                END IF;
+            END $$;
+        """
+
+        create_function = """
+            CREATE OR REPLACE FUNCTION update_loan_updated_at()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.updated_at = now();
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        """
+
+        async with self.db_connection as conn:
+            await conn.execute(create_enum_loan_transaction_type)
+            await conn.execute(create_enum_loan_status_type)
+            await conn.execute(create_loans_table)
+            await conn.execute(create_loan_accounts_table)
+            await conn.execute(create_loan_transactions_table)
             await conn.execute(create_function)
             await conn.execute(create_trigger)
