@@ -44,15 +44,18 @@ class LoanProfileService(AbstractLoanProfileService):
             loan = LoanMapper.map_loan_create_dto_to_loan(loan_create_dto)
             created_loan = await self.uow.loan_repository.create_loan(loan)
         created_loan_dto = LoanMapper.map_loan_to_loan_read_dto(created_loan)
+        print(type(created_loan_dto))
         return created_loan_dto
 
     async def create_loan_transaction(
             self,
+            account_id: int,
             loan_transaction_create_dto: LoanTransactionCreateDTO,
             requesting_user: UserAccessDTO
     ) -> LoanTransactionReadDTO:
         async with self.uow as uow:
-            loan_account = await self.uow.loan_repository.get_loan_account_by_id(loan_transaction_create_dto.loan_account_id)
+            print(type(loan_transaction_create_dto))
+            loan_account = await self.uow.loan_repository.get_loan_account_by_id(account_id)
             account = await self.uow.account_repository.get_account_by_id(loan_account.account_id)
             AccessControl.can_create_loan_transaction(account.user_id, requesting_user)
             loan_transaction = LoanMapper.map_loan_transaction_create_dto_to_loan_transaction(

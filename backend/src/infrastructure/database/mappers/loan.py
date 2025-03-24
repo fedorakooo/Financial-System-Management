@@ -7,11 +7,11 @@ class LoanDatabaseMapper:
     @staticmethod
     def from_db_row_to_loan(row: dict) -> Loan:
         return Loan(
-            amount=dict["amount"],
-            term_months=dict["term_months"],
-            interest_rate=dict["interest_rate"],
-            id=dict["id"],
-            status=dict["status"],
+            amount=row["amount"],
+            term_months=row["term_months"],
+            interest_rate=row["interest_rate"],
+            id=row["id"],
+            status=row["status"],
             updated_at=row["updated_at"],
             created_at=row["created_at"]
         )
@@ -21,7 +21,7 @@ class LoanDatabaseMapper:
         return {
             "interest_rate": loan.interest_rate,
             "amount": loan.amount,
-            "term_months": loan.term_months.value,
+            "term_months": loan.term_months,
             "status": loan.status.value
         }
 
@@ -48,7 +48,8 @@ class LoanDatabaseMapper:
         return LoanAccount(
             account_id=row["account_id"],
             loan_id=row["loan_id"],
-            id=row["id"]
+            id=row["id"],
+            user_id=row["user_id"]
         )
 
     @staticmethod

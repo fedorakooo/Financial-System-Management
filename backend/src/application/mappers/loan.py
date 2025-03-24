@@ -7,7 +7,7 @@ from src.application.dtos.loan import (
     LoanTransactionReadDTO
 )
 from src.domain.entities.loan import Loan, LoanTransaction, LoanAccount
-from src.domain.enums.loan import LoanTransactionType
+from src.domain.enums.loan import LoanTransactionType, LoanTermMonths
 
 
 class LoanMapper:
@@ -17,7 +17,7 @@ class LoanMapper:
     def map_loan_create_dto_to_loan(dto: LoanCreateDTO) -> Loan:
         return Loan(
             amount=dto.amount,
-            term_months=dto.term_months,
+            term_months=dto.term_months.value,
             interest_rate=dto.interest_rate
         )
 
@@ -25,7 +25,7 @@ class LoanMapper:
     def map_loan_transaction_create_dto_to_loan_transaction(
             dto: LoanTransactionCreateDTO,
             loan_transaction_type: LoanTransactionType
-    ) -> Loan:
+    ) -> LoanTransaction:
         return LoanTransaction(
             loan_account_id=dto.loan_account_id,
             type=loan_transaction_type,
@@ -34,9 +34,9 @@ class LoanMapper:
 
     @staticmethod
     def map_loan_to_loan_read_dto(
-            loan: LoanReadDTO
-    ) -> Loan:
-        return Loan(
+            loan: Loan
+    ) -> LoanReadDTO:
+        return LoanReadDTO(
             amount=loan.amount,
             term_months=loan.term_months,
             interest_rate=loan.interest_rate,

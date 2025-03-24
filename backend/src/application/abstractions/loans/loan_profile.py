@@ -30,5 +30,10 @@ class AbstractLoanProfileService(ABC):
         pass
 
     @abstractmethod
-    async def create_loan_transaction(self, loan_transaction: LoanTransactionCreateDTO) -> LoanTransactionReadDTO:
+    async def create_loan_transaction(
+            self,
+            account_id: int,
+            loan_transaction: LoanTransactionCreateDTO,
+            requesting_user: UserAccessDTO
+    ) -> LoanTransactionReadDTO:
         pass

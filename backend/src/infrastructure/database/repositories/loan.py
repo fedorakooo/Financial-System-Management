@@ -23,7 +23,7 @@ class LoanRepository(AbstractLoanRepository):
         return [LoanDatabaseMapper.from_db_row_to_loan_transaction(row) for row in rows]
 
     async def get_loan_account_by_id(self, loan_account_id: int) -> LoanAccount:
-        stmt = "SELECT * FROM loan_accounts WHERE loan_account_id = $1"
+        stmt = "SELECT * FROM loan_accounts WHERE account_id = $1"
         row = await self.connection.fetchrow(stmt, loan_account_id)
         if row is None:
             raise NotFoundError(f"Loan account with id = {loan_account_id} not found")

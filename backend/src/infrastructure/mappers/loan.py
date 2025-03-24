@@ -54,5 +54,6 @@ class LoanSchemaMapper:
     @staticmethod
     def map_loan_transaction_from_create_request(request: LoanTransactionCreateRequest) -> LoanTransactionCreateRequest:
        return LoanTransactionCreateRequest(
-           amount=request.amount
+           amount=request.amount,
+
        )

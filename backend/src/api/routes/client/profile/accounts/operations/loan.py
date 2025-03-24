@@ -49,6 +49,7 @@ async def get_loan_account_by_id(
         log_service.error(
             f"User ID {requesting_user.id} ({requesting_user.role}) encountered an error while fetching loan account: {str(exc)}"
         )
+        raise exc
         raise HttpExceptionFactory.create_http_exception(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             f"An unexpected error occurred while fetching loan account with ID {loan_account_id}."
@@ -86,6 +87,7 @@ async def create_loan_request(
         log_service.error(
             f"User ID {requesting_user.id} ({requesting_user.role}) encountered an unexpected error while creating loan request: {str(exc)}"
         )
+        raise exc
         raise HttpExceptionFactory.create_http_exception(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             "An unexpected error occurred while creating loan request."
@@ -108,11 +110,18 @@ async def create_loan_transaction(
     loan_transaction_create_dto = LoanSchemaMapper.map_loan_transaction_from_create_request(loan_transaction_create_request)
     try:
         created_loan_transaction_dto = await loan_profile_service.create_loan_transaction(
-            loan_transaction_create_dto
+            loan_account_id,
+            loan_transaction_create_dto,
+            requesting_user
         )
         log_service.info(
             f"User ID {requesting_user.id} ({requesting_user.role}) successfully created loan transaction with ID {created_loan_transaction_dto.id}"
         )
+    except NotFoundError as exc:
+        log_service.warning(
+            f"User ID {requesting_user.id} ({requesting_user.role}) tried to create loan transaction for non-existent loan account with ID {loan_account_id}: {str(exc)}"
+        )
+        raise HttpExceptionFactory.create_http_exception(status.HTTP_404_NOT_FOUND, str(exc))
     except ForbiddenError as exc:
         log_service.error(
             f"User ID {requesting_user.id} ({requesting_user.role}) encountered a ForbiddenError while creating loan transaction request: {str(exc)}"
