@@ -7,7 +7,7 @@ from src.application.dtos.loan import (
     LoanTransactionReadDTO
 )
 from src.domain.entities.loan import Loan, LoanTransaction, LoanAccount
-from src.domain.enums.loan import LoanTransactionType, LoanTermMonths
+from src.domain.enums.loan import LoanTransactionType
 
 
 class LoanMapper:
@@ -41,7 +41,6 @@ class LoanMapper:
             term_months=loan.term_months,
             interest_rate=loan.interest_rate,
             id=loan.id,
-            status=loan.status,
             updated_at=loan.updated_at,
             created_at=loan.created_at
         )
@@ -58,6 +57,7 @@ class LoanMapper:
             account=account,
             loan_id=loan_account.loan_id,
             loan=loan,
+            status=loan_account.status,
             user_id=loan_account.user_id
         )
 

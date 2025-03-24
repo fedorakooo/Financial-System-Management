@@ -9,7 +9,9 @@ from src.application.dtos.user import UserAccessDTO
 from src.domain.exceptions.forbidden import ForbiddenError
 from src.infrastructure.dependencies.app import Application
 from src.infrastructure.exceptions.repository_exceptions import NotFoundError
+from src.infrastructure.mappers.account import AccountSchemaMapper
 from src.infrastructure.mappers.loan import LoanSchemaMapper
+from src.infrastructure.schemas.account import AccountCreateRequest
 from src.infrastructure.schemas.loan import LoanAccountResponse, LoanResponse, LoanCreateRequest, \
     LoanTransactionResponse, LoanTransactionCreateRequest
 
@@ -58,25 +60,28 @@ async def get_loan_account_by_id(
     return fetched_loan_account
 
 
-@router.post("/loans/", response_model=LoanResponse)
+@router.post("/loan-accounts/", response_model=LoanAccountResponse)
 @inject
 async def create_loan_request(
         loan_create_request: LoanCreateRequest,
+        account_create_request: AccountCreateRequest,
         requesting_user: UserAccessDTO = Depends(get_current_active_auth_user),
         loan_profile_service: AbstractLoanProfileService = Depends(
             Provide[Application.services.loan_profile_service]
         ),
         log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
-) -> LoanResponse:
+) -> LoanAccountResponse:
     log_service.info(f"User ID {requesting_user.id} ({requesting_user.role}) is attempting to create loan request")
     loan_create_dto = LoanSchemaMapper.map_loan_from_create_request(loan_create_request)
+    account_create_dto = AccountSchemaMapper.from_create_request(account_create_request, requesting_user.id)
     try:
-        created_loan_dto = await loan_profile_service.create_loan_request(
+        created_loan_account_dto = await loan_profile_service.create_loan_request(
             loan_create_dto,
+            account_create_dto,
             requesting_user
         )
         log_service.info(
-            f"User ID {requesting_user.id} ({requesting_user.role}) successfully created loan request with ID {created_loan_dto.id}"
+            f"User ID {requesting_user.id} ({requesting_user.role}) successfully created loan request with ID {created_loan_account_dto.id}"
         )
     except ForbiddenError as exc:
         log_service.error(
@@ -92,8 +97,8 @@ async def create_loan_request(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             "An unexpected error occurred while creating loan request."
         )
-    created_loan = LoanSchemaMapper.map_loan_to_response(created_loan_dto)
-    return created_loan
+    created_loan_account = LoanSchemaMapper.map_loan_account_to_response(created_loan_account_dto)
+    return created_loan_account
 
 @router.post("/loan_accounts/{loan_account_id}/transactions", response_model=LoanTransactionResponse)
 @inject

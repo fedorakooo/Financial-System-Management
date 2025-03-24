@@ -1,8 +1,12 @@
 from src.application.dtos.loan import LoanReadDTO, LoanCreateDTO, LoanTransactionReadDTO, LoanAccountReadDTO
 from src.infrastructure.mappers.account import AccountSchemaMapper
-from src.infrastructure.schemas.loan import LoanResponse, LoanCreateRequest, LoanTransactionResponse, \
-    LoanAccountResponse, LoanTransactionCreateRequest
-
+from src.infrastructure.schemas.loan import (
+    LoanResponse,
+    LoanCreateRequest,
+    LoanTransactionResponse,
+    LoanAccountResponse,
+    LoanTransactionCreateRequest
+)
 
 class LoanSchemaMapper:
     """Utility class for mapping between Data Transfer Objects (DTOs) and Pydantic models for the Loans entities."""
@@ -14,7 +18,6 @@ class LoanSchemaMapper:
             amount=dto.amount,
             term_months=dto.term_months,
             interest_rate=dto.interest_rate,
-            status=dto.status,
             created_at=dto.created_at,
             updated_at=dto.updated_at
         )
@@ -28,6 +31,7 @@ class LoanSchemaMapper:
             account=account_response,
             loan_id=dto.loan_id,
             user_id=dto.user_id,
+            status=dto.status,
             loan=loan_response,
             id=dto.id
         )
@@ -45,7 +49,6 @@ class LoanSchemaMapper:
     @staticmethod
     def map_loan_from_create_request(request: LoanCreateRequest) -> LoanCreateDTO:
         return LoanCreateDTO(
-            account_id=request.account_id,
             amount=request.amount,
             term_months=request.term_months,
             interest_rate=request.interest_rate
@@ -55,5 +58,4 @@ class LoanSchemaMapper:
     def map_loan_transaction_from_create_request(request: LoanTransactionCreateRequest) -> LoanTransactionCreateRequest:
        return LoanTransactionCreateRequest(
            amount=request.amount,
-
        )

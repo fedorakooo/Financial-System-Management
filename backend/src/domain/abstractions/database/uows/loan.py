@@ -26,3 +26,5 @@ class AbstractLoanUnitOfWork(ABC):
     def account_repository(self) -> AbstractAccountRepository:
         """Return the account repository."""
         pass
+
+

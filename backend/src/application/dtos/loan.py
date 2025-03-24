@@ -3,12 +3,11 @@ from datetime import datetime
 from decimal import Decimal
 
 from src.application.dtos.account import AccountReadDTO
-from src.domain.enums.loan import LoanTermMonths, LoanStatus, LoanTransactionType
+from src.domain.enums.loan import LoanTermMonths, LoanAccountStatus, LoanTransactionType
 
 
 @dataclass(frozen=True)
 class LoanCreateDTO:
-    account_id: int
     amount: Decimal("0.00")
     term_months: LoanTermMonths
     interest_rate: Decimal
@@ -20,7 +19,6 @@ class LoanReadDTO:
     term_months: LoanTermMonths
     interest_rate: Decimal
     id: int
-    status: LoanStatus
     updated_at: datetime
     created_at: datetime
 
@@ -30,6 +28,7 @@ class LoanAccountReadDTO:
     account_id: int
     account: AccountReadDTO
     loan_id: int
+    status: LoanAccountStatus
     loan: LoanReadDTO
     user_id: int
     id: int

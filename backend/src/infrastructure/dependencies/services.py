@@ -11,6 +11,7 @@ from src.application.services.auth.token import TokenService
 from src.application.services.auth.user import AuthUserService
 from src.application.services.banks.bank_management import BankManagementService
 from src.application.services.banks.bank_public import BankPublicService
+from src.application.services.loans.loan_management import LoanManagementService
 from src.application.services.loans.loan_profile import LoanProfileService
 from src.application.services.logs.log import LogService
 from src.application.services.profile.profile import ProfileService
@@ -23,7 +24,6 @@ from src.application.services.withdrawals.withdrawal_profile import WithdrawalPr
 class Services(containers.DeclarativeContainer):
     config = providers.Configuration()
 
-    repositories = providers.DependenciesContainer()
     core = providers.DependenciesContainer()
     uow = providers.DependenciesContainer()
 
@@ -55,7 +55,7 @@ class Services(containers.DeclarativeContainer):
 
     user_registration_service = providers.Factory(
         UserRegistrationService,
-        repository=repositories.user_repository,
+        uow=uow.user_unit_of_work,
         password_handler=core.password_handler
     )
 
@@ -118,5 +118,10 @@ class Services(containers.DeclarativeContainer):
 
     loan_profile_service = providers.Factory(
         LoanProfileService,
+        uow=uow.loan_unit_of_work,
+    )
+
+    loan_management_service = providers.Factory(
+        LoanManagementService,
         uow=uow.loan_unit_of_work,
     )

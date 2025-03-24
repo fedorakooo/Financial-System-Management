@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from src.application.dtos.account import AccountCreateDTO
 from src.application.dtos.loan import (
     LoanAccountReadDTO,
     LoanCreateDTO,
@@ -25,6 +26,7 @@ class AbstractLoanProfileService(ABC):
     async def create_loan_request(
             self,
             loan_create_dto: LoanCreateDTO,
+            account_create_dto: AccountCreateDTO,
             requesting_user: UserAccessDTO
     ) -> LoanReadDTO:
         pass

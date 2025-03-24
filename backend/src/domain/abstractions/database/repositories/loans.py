@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from src.domain.entities.loan import Loan, LoanTransaction, LoanAccount
+from src.domain.enums.loan import LoanAccountStatus
 
 
 class AbstractLoanRepository(ABC):
@@ -39,5 +40,8 @@ class AbstractLoanRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_loan_by_id(self, loan_id: int, loan_update: Loan) -> Loan:
+    async def update_loan_account_status_by_id(self, loan_account_id: int, loan_status: LoanAccountStatus) -> LoanAccount:
+        pass
+
+    async def create_loan_account(self, loan_account_create: LoanAccount):
         pass

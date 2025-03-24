@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class LoanStatus(Enum):
+class LoanAccountStatus(Enum):
     PENDING = 'PENDING'
     ACTIVE = 'ACTIVE'
     REJECTED = 'REJECTED'
