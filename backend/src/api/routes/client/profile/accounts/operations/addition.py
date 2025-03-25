@@ -12,6 +12,8 @@ from src.infrastructure.exceptions.repository_exceptions import NotFoundError, U
 from src.infrastructure.mappers.addition import AdditionSchemaMapper
 from src.infrastructure.schemas.addition import AdditionResponse, AdditionCreateRequest
 
+
+# main router profile/accounts/...
 router = APIRouter(prefix="/additions", tags=["Additions"])
 
 

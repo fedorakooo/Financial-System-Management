@@ -43,6 +43,6 @@ class AdditionRepository(AbstractAdditionRepository):
 
         stmt = f"INSERT INTO additions ({columns}) VALUES ({placeholders}) RETURNING *"
 
-        row = self.connection.fetchrow(stmt, *values)
+        row = await self.connection.fetchrow(stmt, *values)
 
         return AdditionDatabaseMapper.from_db_row(row)

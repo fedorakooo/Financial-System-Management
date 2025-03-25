@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from decimal import Decimal
 
 from src.domain.entities.account import Account
+from src.domain.enums.account import AccountStatus
 
 
 class AbstractAccountRepository(ABC):
@@ -39,6 +40,10 @@ class AbstractAccountRepository(ABC):
             NotFoundError: If the account with the specified id is not found.
             NoFieldsToUpdateError: If no fields are provided for updating.
         """
+        pass
+
+    @abstractmethod
+    async def update_account_status(self, account_id: int, new_status: AccountStatus) -> None:
         pass
 
     @abstractmethod

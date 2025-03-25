@@ -4,6 +4,7 @@ from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.domain.entities.account import Account
+from src.domain.enums.account import AccountStatus
 from src.infrastructure.database.handlers.error_handler import ErrorHandler
 from src.infrastructure.database.mappers.account import AccountDatabaseMapper
 from src.infrastructure.exceptions.repository_exceptions import NotFoundError
@@ -70,6 +71,10 @@ class AccountRepository(AbstractAccountRepository):
 
         await self.connection.execute(stmt, account_id, new_balance)
 
+    async def update_account_status(self, account_id: int, new_status: AccountStatus) -> None:
+        stmt = "UPDATE accounts SET status = $2 WHERE id = $1"
+
+        await self.connection.execute(stmt, account_id, new_status.value)
 
     async def delete_account_by_id(self, account_id: int) -> None:
         stmt = "DELETE FROM accounts WHERE id = $1"

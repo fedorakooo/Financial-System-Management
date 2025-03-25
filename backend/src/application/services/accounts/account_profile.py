@@ -4,6 +4,7 @@ from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.account import AccountMapper
 from src.application.services.accounts.access_control import AccountProfileAccessControlService as AccessControl
 from src.domain.abstractions.database.uows.account import AbstractAccountUnitOfWork
+from src.domain.enums.account import AccountType
 
 
 class AccountProfileService(AbstractAccountProfileService):
