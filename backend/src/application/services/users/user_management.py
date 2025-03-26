@@ -1,7 +1,6 @@
 from src.application.abstractions.users.user_management import AbstractUserManagementService
 from src.application.dtos.user import UserAccessDTO, UserReadDTO, UserUpdateDTO
 from src.application.mappers.user import UserMapper
-from src.domain.abstractions.database.repositories.users import AbstractUserRepository
 from src.application.services.users.access_control import UserManagementAccessControlService as AccessControl
 from src.domain.abstractions.database.uows.user import AbstractUserUnitOfWork
 

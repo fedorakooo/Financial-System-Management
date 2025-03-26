@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 
 from src.domain.entities.deposit import DepositAccount, DepositTransaction
-from src.domain.entities.loan import Loan, LoanTransaction, LoanAccount
-from src.domain.enums.loan import LoanAccountStatus
 
 
 class AbstractDepositRepository(ABC):

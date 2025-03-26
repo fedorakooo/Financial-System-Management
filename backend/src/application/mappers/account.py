@@ -19,7 +19,7 @@ class AccountMapper:
             user_id=user_id,
             bank_id=dto.bank_id,
             type=account_type,
-            account_status=account_status
+            status=account_status
         )
 
     @staticmethod

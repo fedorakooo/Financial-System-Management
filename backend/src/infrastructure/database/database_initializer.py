@@ -283,15 +283,6 @@ class DatabaseInitializer:
             END $$;
         """
 
-        create_enum_loan_status_type = """
-            DO $$ 
-            BEGIN
-                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'loan_status_type') THEN
-                    CREATE TYPE loan_status_type AS ENUM ('PENDING', 'ACTIVE', 'REJECTED', 'COMPLETED');
-                END IF;
-            END $$;
-        """
-
         create_loans_table = """
             CREATE TABLE IF NOT EXISTS loans (
                 id SERIAL PRIMARY KEY,
@@ -308,8 +299,7 @@ class DatabaseInitializer:
                 id SERIAL PRIMARY KEY,
                 account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
                 loan_id BIGINT NOT NULL REFERENCES loans(id) ON DELETE CASCADE,
-                user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                status loan_status_type NOT NULL
+                user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE
             );
         """
 
@@ -347,7 +337,6 @@ class DatabaseInitializer:
 
         async with self.db_connection as conn:
             await conn.execute(create_enum_loan_transaction_type)
-            await conn.execute(create_enum_loan_status_type)
             await conn.execute(create_loans_table)
             await conn.execute(create_loan_accounts_table)
             await conn.execute(create_loan_transactions_table)

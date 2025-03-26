@@ -32,7 +32,7 @@ router.include_router(loan_router)
 router.include_router(deposit_router)
 
 
-@router.get("/{account_id}", response_model=list[AccountResponse], responses={
+@router.get("/{account_id}", response_model=AccountResponse, responses={
     401: {"description": "Invalid or expired token"},
     403: {"description": "User is inactive"},
     404: {"description": "Account not found"},
@@ -46,7 +46,7 @@ async def get_account_by_id(
             Provide[Application.services.account_profile_service]
         ),
         log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
-) -> list[AccountResponse]:
+) -> AccountResponse:
     log_service.info(f"User ID {requesting_user.id} ({requesting_user.role}) is fetching account with ID {account_id}")
     try:
         fetched_account_dto = await account_profile_service.get_account_by_id(account_id, requesting_user)

@@ -4,8 +4,8 @@ from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.addition import AdditionMapper
 from src.application.services.additions.access_control import AdditionProfileAccessControlService as AccessControl
 from src.domain.abstractions.database.uows.addition import AbstractAdditionUnitOfWork
-from src.domain.enums.account import AccountStatus
-from src.domain.exceptions.account import InactiveAccountError
+from src.domain.enums.account import AccountStatus, AccountType
+from src.domain.exceptions.account import InactiveAccountError, InvalidAccountTypeError
 
 
 class AdditionProfileService(AbstractAdditionProfileService):
@@ -37,6 +37,8 @@ class AdditionProfileService(AbstractAdditionProfileService):
             AccessControl.can_create_addition(account.user_id, requesting_user)
             if account.status is not AccountStatus.ACTIVE:
                 raise InactiveAccountError(account.status)
+            if account.type is not AccountType.SETTLEMENT:
+                raise InvalidAccountTypeError(account.type, AccountType.SETTLEMENT)
             new_account_balance = account.balance + addition_create_dto.amount
             addition_create = AdditionMapper.map_addition_create_dto_to_addition(addition_create_dto, account_id)
             created_addition = await uow.addition_repository.create_addition(addition_create)

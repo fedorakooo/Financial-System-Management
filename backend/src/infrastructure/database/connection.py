@@ -11,11 +11,7 @@ DATABASE_URL = settings.db.url
 class DatabaseConnection(AbstractDatabaseConnection):
     """Class for managing the connection to a PostgreSQL database using asyncpg."""
 
-    def __init__(
-            self,
-            dsn: str,
-            logger: AbstractLogger
-    ):
+    def __init__(self, dsn: str, logger: AbstractLogger):
         self.dsn = dsn
         self.logger = logger
         self._connection = None

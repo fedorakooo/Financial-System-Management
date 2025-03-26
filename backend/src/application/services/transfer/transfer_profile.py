@@ -2,8 +2,6 @@ from src.application.abstractions.transfers.transfer_profile import AbstractTran
 from src.application.dtos.transfer import TransferReadDTO, TransferCreateDTO
 from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.transfer import TransferMapper
-from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
-from src.domain.abstractions.database.repositories.transfer import AbstractTransferRepository
 from src.application.services.transfer.access_control import TransferProfileAccessControlService as AccessControl
 from src.domain.abstractions.database.uows.transfer import AbstractTransferUnitOfWork
 from src.domain.enums.account import AccountStatus
@@ -12,10 +10,7 @@ from src.infrastructure.exceptions.repository_exceptions import NotFoundError
 
 
 class TransferProfileService(AbstractTransferProfileService):
-    def __init__(
-            self,
-            uow: AbstractTransferUnitOfWork
-    ) -> None:
+    def __init__(self, uow: AbstractTransferUnitOfWork):
         self.uow = uow
 
     async def get_transfers_by_account_id(

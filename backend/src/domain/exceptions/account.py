@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from src.domain.enums.account import AccountStatus
+from src.domain.enums.account import AccountStatus, AccountType
 
 
 class AccountError(Exception):
@@ -42,4 +42,25 @@ class InactiveAccountError(AccountError):
         self.current_status = current_status
         super().__init__(
             f"Account must be {AccountStatus.ACTIVE} for this operation. Current status: {self.current_status}"
+        )
+
+
+class SuspendedAccountOperationError(AccountError):
+    """Exception raised when staff attempts to perform restricted operation on suspended account."""
+
+    def __init__(self, account_id: int, current_status: AccountStatus):
+        self.current_status = current_status
+        self.account_id = account_id
+        super().__init__(
+            f"Account must with ID {self.account_id} be {AccountStatus.ACTIVE} for this operation. Current status: {self.current_status}"
+        )
+
+class InvalidAccountTypeError(AccountError):
+    """Exception raised when an operation is attempted on an invalid account type."""
+
+    def __init__(self, account_type: AccountType, required_type: AccountType):
+        self.account_type = account_type
+        self.required_type = required_type
+        super().__init__(
+            f"Invalid account type: {self.account_type}. Required account type: {self.required_type}."
         )
