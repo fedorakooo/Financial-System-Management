@@ -8,8 +8,10 @@ const Login = lazy(() => import("./components/general/login/Login"));
 const Registration = lazy(() => import("./components/general/registration/Registration"));
 const Profile = lazy(() => import("./components/profile/Profile"));
 const Accounts = lazy(() => import("./components/client/Account"));
-
-
+const Additions = lazy(() => import("./components/client/general/Addition"));
+const Loans = lazy(() => import("./components/client/general/Loan"));
+const Transfers = lazy(() => import("./components/client/general/Transfer"));
+const CreateLoan = lazy(() => import("./components/client/general/LoanCreate"));
 
 const Home = () => (
   <div className="p-4">
@@ -36,6 +38,11 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/registration" element={<Registration />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/accounts/additions" element={<Additions />} />
+            <Route path="/profile/accounts/loan_accounts/:loanAccountId" element={<Loans />} />
+            <Route path="/profile/accounts/loan_accounts/:loanAccountId/transactions" element={<Loans />} />
+            <Route path="/profile/accounts/loan_accounts/" element={<CreateLoan />} />
+            <Route path="/profile/accounts/transfers/" element={<Transfers />} />
             <Route path="/profile/accounts" element={<Accounts />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

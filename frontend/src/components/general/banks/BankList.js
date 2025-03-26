@@ -24,31 +24,65 @@ const BankList = () => {
     fetchBanks();
   }, []);
 
-  if (loading) return <p>Загрузка...</p>;
-  if (error) return <p style={{ color: "red" }}>Ошибка: {error}</p>;
+  if (loading) return <p style={styles.loadingText}>Загрузка...</p>;
+  if (error) return <p style={styles.errorText}>Ошибка: {error}</p>;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-      {banks.map((bank, index) => (
-        <div key={bank.id}>
-          <div
-            className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition transform hover:scale-105 bg-white"
-          >
-            <h3 className="text-lg font-semibold mb-2 text-gray-800">{bank.name}</h3>
-            <p><strong>ID:</strong> {bank.id}</p>
-            <p><strong>BIC:</strong> {bank.bic}</p>
-            <p><strong>Адрес:</strong> {bank.address}</p>
-            <p><strong>Создан:</strong> {new Date(bank.created_at).toLocaleString()}</p>
-            <p><strong>Обновлён:</strong> {new Date(bank.updated_at).toLocaleString()}</p>
-          </div>
+    <div style={styles.container}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+        {banks.map((bank, index) => (
+          <div key={bank.id}>
+            <div style={styles.bankCard} className="transition-transform hover:scale-105">
+              <h3 style={styles.bankTitle}>{bank.name}</h3>
+              <p><strong>ID:</strong> {bank.id}</p>
+              <p><strong>BIC:</strong> {bank.bic}</p>
+              <p><strong>Адрес:</strong> {bank.address}</p>
+              <p><strong>Создан:</strong> {new Date(bank.created_at).toLocaleString()}</p>
+              <p><strong>Обновлён:</strong> {new Date(bank.updated_at).toLocaleString()}</p>
+            </div>
 
-          {index < banks.length - 1 && (
-            <hr className="my-4 border-t-2 border-gray-300" />
-          )}
-        </div>
-      ))}
+            {index < banks.length - 1 && <hr style={styles.hr} />}
+          </div>
+        ))}
+      </div>
     </div>
   );
+};
+
+const styles = {
+  container: {
+    padding: "20px",
+    backgroundColor: "#f7fafc",
+  },
+  loadingText: {
+    fontSize: "18px",
+    color: "#4a90e2",
+    textAlign: "center",
+  },
+  errorText: {
+    fontSize: "18px",
+    color: "red",
+    textAlign: "center",
+  },
+  bankCard: {
+    backgroundColor: "#fff",
+    padding: "20px",
+    borderRadius: "8px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    border: "1px solid #e2e8f0",
+    transition: "box-shadow 0.3s ease",
+    cursor: "pointer",
+  },
+  bankTitle: {
+    fontSize: "20px",
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: "15px",
+  },
+  hr: {
+    margin: "20px 0",
+    borderTop: "2px solid #e2e8f0",
+  },
 };
 
 export default BankList;

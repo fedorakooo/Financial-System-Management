@@ -28,14 +28,14 @@ const GeneralBank = () => {
     }
   }, [bankId]);
 
-  if (loading) return <p>Загрузка...</p>;
-  if (error) return <p style={{ color: "red" }}>Ошибка: {error}</p>;
+  if (loading) return <p style={styles.loadingText}>Загрузка...</p>;
+  if (error) return <p style={styles.errorText}>Ошибка: {error}</p>;
 
   return (
-    <div className="p-4">
+    <div style={styles.container}>
       {bank && (
-        <div className="border border-gray-300 p-4 rounded-lg shadow-md bg-white">
-          <h3 className="text-2xl font-semibold text-gray-800">{bank.name}</h3>
+        <div style={styles.bankCard}>
+          <h3 style={styles.bankTitle}>{bank.name}</h3>
           <p><strong>ID:</strong> {bank.id}</p>
           <p><strong>BIC:</strong> {bank.bic}</p>
           <p><strong>Адрес:</strong> {bank.address}</p>
@@ -45,6 +45,42 @@ const GeneralBank = () => {
       )}
     </div>
   );
+};
+
+const styles = {
+  container: {
+    padding: "20px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "100vh",
+    backgroundColor: "#f7fafc",
+  },
+  bankCard: {
+    width: "100%",
+    maxWidth: "600px",
+    backgroundColor: "#fff",
+    padding: "20px",
+    borderRadius: "8px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    border: "1px solid #e2e8f0",
+  },
+  bankTitle: {
+    fontSize: "24px",
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: "15px",
+  },
+  loadingText: {
+    fontSize: "18px",
+    color: "#4a90e2",
+    textAlign: "center",
+  },
+  errorText: {
+    fontSize: "18px",
+    color: "red",
+    textAlign: "center",
+  },
 };
 
 export default GeneralBank;

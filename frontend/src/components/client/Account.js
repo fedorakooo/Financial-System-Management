@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
 
+const accountTypeLabels = {
+  SALARY: "Зарплатный",
+  DEPOSIT: "Депозитный",
+  SETTLEMENT: "Расчётный",
+  LOAN: "Кредитный",
+};
+
 const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [newAccountBankId, setNewAccountBankId] = useState("");
-  const [isEditing, setIsEditing] = useState(null); // ID редактируемого счета
+  const [isEditing, setIsEditing] = useState(null);
   const [updatedStatus, setUpdatedStatus] = useState("");
 
-  // Загрузка счетов
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
@@ -21,10 +27,7 @@ const Accounts = () => {
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Ошибка загрузки счетов");
-        }
-
+        if (!response.ok) throw new Error("Ошибка загрузки счетов");
         const data = await response.json();
         setAccounts(data);
       } catch (err) {
@@ -37,7 +40,6 @@ const Accounts = () => {
     fetchAccounts();
   }, []);
 
-  // Создание счета
   const handleCreateAccount = async () => {
     try {
       const token = localStorage.getItem("access_token");
@@ -52,10 +54,8 @@ const Accounts = () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Ошибка создания счета");
-      }
-
+      if (!response.ok) throw new Error("Ошибка создания счета");
+      
       const data = await response.json();
       setAccounts([...accounts, data]);
       setIsCreating(false);
@@ -66,7 +66,6 @@ const Accounts = () => {
     }
   };
 
-  // Обновление статуса счета
   const handleUpdateAccount = async (accountId) => {
     try {
       const token = localStorage.getItem("access_token");
@@ -81,12 +80,10 @@ const Accounts = () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Ошибка обновления счета");
-      }
-
+      if (!response.ok) throw new Error("Ошибка обновления счета");
+      
       const data = await response.json();
-      setAccounts(accounts.map((acc) => (acc.id === accountId ? data : acc)));
+      setAccounts(accounts.map(acc => acc.id === accountId ? data : acc));
       setIsEditing(null);
       setUpdatedStatus("");
       alert("Статус счета успешно обновлен!");
@@ -95,29 +92,7 @@ const Accounts = () => {
     }
   };
 
-  // Удаление счета
-  const handleDeleteAccount = async (accountId) => {
-    if (window.confirm("Вы уверены, что хотите удалить счет?")) {
-      try {
-        const token = localStorage.getItem("access_token");
-        const response = await fetch(`http://localhost:8000/profile/accounts/${accountId}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Ошибка удаления счета");
-        }
-
-        setAccounts(accounts.filter((acc) => acc.id !== accountId));
-        alert("Счет успешно удален!");
-      } catch (err) {
-        setError(err.message);
-      }
-    }
-  };
+  // Удалена функция handleDeleteAccount
 
   if (loading) return <p>Загрузка...</p>;
   if (error) return <p style={{ color: "red" }}>Ошибка: {error}</p>;
@@ -126,7 +101,6 @@ const Accounts = () => {
     <div className="p-4">
       <h1 className="text-2xl font-semibold mb-4">Счета</h1>
 
-      {/* Создание счета */}
       {isCreating ? (
         <div className="mb-4">
           <label htmlFor="bankId" className="block text-gray-700">ID банка</label>
@@ -159,10 +133,10 @@ const Accounts = () => {
         </button>
       )}
 
-      {/* Список счетов */}
       <div className="space-y-4">
         {accounts.map((account) => (
           <div key={account.id} className="p-4 border border-gray-300 rounded-lg">
+            <p><strong>Тип счета:</strong> {accountTypeLabels[account.type] || account.type}</p>
             <p><strong>ID счета:</strong> {account.id}</p>
             <p><strong>ID пользователя:</strong> {account.user_id}</p>
             <p><strong>ID банка:</strong> {account.bank_id}</p>
@@ -171,7 +145,6 @@ const Accounts = () => {
             <p><strong>Создан:</strong> {new Date(account.created_at).toLocaleString()}</p>
             <p><strong>Обновлен:</strong> {new Date(account.updated_at).toLocaleString()}</p>
 
-            {/* Редактирование статуса */}
             {isEditing === account.id ? (
               <div className="mt-2">
                 <label htmlFor="status" className="block text-gray-700">Новый статус</label>
@@ -204,13 +177,7 @@ const Accounts = () => {
               </button>
             )}
 
-            {/* Удаление счета */}
-            <button
-              onClick={() => handleDeleteAccount(account.id)}
-              className="bg-red-500 text-white p-2 rounded-lg mt-2 ml-2 hover:bg-red-600"
-            >
-              Удалить счет
-            </button>
+            {/* Удалена кнопка удаления счета */}
           </div>
         ))}
       </div>
