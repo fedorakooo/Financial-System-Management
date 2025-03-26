@@ -15,10 +15,10 @@ from src.infrastructure.schemas.account import AccountCreateRequest
 from src.infrastructure.schemas.loan import LoanAccountResponse, LoanResponse, LoanCreateRequest, \
     LoanTransactionResponse, LoanTransactionCreateRequest
 
-router = APIRouter(prefix="", tags=["Loans"])
+router = APIRouter(prefix="/loan_accounts", tags=["Loans"])
 
 
-@router.get("/loan_accounts/{loan_account_id}", response_model=LoanAccountResponse)
+@router.get("/{loan_account_id}", response_model=LoanAccountResponse)
 @inject
 async def get_loan_account_by_id(
         loan_account_id: int,
@@ -60,7 +60,7 @@ async def get_loan_account_by_id(
     return fetched_loan_account
 
 
-@router.post("/loan-accounts/", response_model=LoanAccountResponse)
+@router.post("/", response_model=LoanAccountResponse)
 @inject
 async def create_loan_request(
         loan_create_request: LoanCreateRequest,
@@ -100,7 +100,7 @@ async def create_loan_request(
     created_loan_account = LoanSchemaMapper.map_loan_account_to_response(created_loan_account_dto)
     return created_loan_account
 
-@router.post("/loan_accounts/{loan_account_id}/transactions", response_model=LoanTransactionResponse)
+@router.post("/{loan_account_id}/transactions", response_model=LoanTransactionResponse)
 @inject
 async def create_loan_transaction(
         loan_account_id: int,

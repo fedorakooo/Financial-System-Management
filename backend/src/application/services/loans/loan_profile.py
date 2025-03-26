@@ -5,17 +5,16 @@ from src.application.mappers.account import AccountMapper
 from src.application.mappers.loan import LoanMapper
 from src.domain.abstractions.database.uows.loan import AbstractLoanUnitOfWork
 from src.application.services.loans.access_control import LoanProfileAccessControlService as AccessControl
-from src.domain.entities.account import Account
 from src.domain.entities.loan import LoanAccount
 from src.domain.enums.account import AccountType
 from src.domain.enums.loan import LoanTransactionType, LoanAccountStatus
 from src.application.dtos.loan import (
     LoanAccountReadDTO,
     LoanCreateDTO,
-    LoanReadDTO,
     LoanTransactionCreateDTO,
     LoanTransactionReadDTO
 )
+from src.domain.exceptions.payment import PaymentExceedsLimitError
 
 
 class LoanProfileService(AbstractLoanProfileService):
@@ -34,9 +33,12 @@ class LoanProfileService(AbstractLoanProfileService):
             loan = await self.uow.loan_repository.get_loan_by_id(loan_account.loan_id)
         loan_read_dto = LoanMapper.map_loan_to_loan_read_dto(loan)
         account_read_dto = AccountMapper.map_account_to_account_read_dto(account)
-        loan_account_dto = LoanMapper.map_loan_account_to_loan_account_read_dto(loan_account, account_read_dto, loan_read_dto)
+        loan_account_dto = LoanMapper.map_loan_account_to_loan_account_read_dto(
+            loan_account,
+            account_read_dto,
+            loan_read_dto
+        )
         return loan_account_dto
-
 
     async def create_loan_request(
             self,
@@ -62,23 +64,41 @@ class LoanProfileService(AbstractLoanProfileService):
                     user_id=created_account.user_id
                 )
             )
-        created_loan_account_dto = LoanMapper.map_loan_account_to_loan_account_read_dto(created_loan_account, created_account, created_loan)
+        created_loan_account_dto = LoanMapper.map_loan_account_to_loan_account_read_dto(
+            created_loan_account,
+            created_account, created_loan
+        )
         return created_loan_account_dto
 
     async def create_loan_transaction(
             self,
-            account_id: int,
+            loan_account_id: int,
             loan_transaction_create_dto: LoanTransactionCreateDTO,
             requesting_user: UserAccessDTO
     ) -> LoanTransactionReadDTO:
         async with self.uow as uow:
-            loan_account = await self.uow.loan_repository.get_loan_account_by_id(account_id)
-            account = await self.uow.account_repository.get_account_by_id(loan_account.account_id)
-            AccessControl.can_create_loan_transaction(account.user_id, requesting_user)
+            loan_account = await uow.loan_repository.get_loan_account_by_id(loan_account_id)
+            AccessControl.can_create_loan_transaction(loan_account.user_id, requesting_user)
+            loan = await self.uow.loan_repository.get_loan_by_id(loan_account.loan_id)
+            max_allowed_payment = loan.amount * loan.interest_rate
+            loan_transactions = await uow.loan_repository.get_loan_transactions_by_loan_account_id(loan_account_id)
+            already_paid = sum(loan_transaction.amount for loan_transaction in loan_transactions)
+            if already_paid + loan_transaction_create_dto.amount > max_allowed_payment:
+                raise PaymentExceedsLimitError(
+                    payment_amount=loan_transaction_create_dto.amount,
+                    already_paid=already_paid,
+                    max_allowed=max_allowed_payment
+                )
             loan_transaction = LoanMapper.map_loan_transaction_create_dto_to_loan_transaction(
                 loan_transaction_create_dto,
                 LoanTransactionType.PAYMENT
             )
             created_loan_transaction = await self.uow.loan_repository.create_loan_transaction(loan_transaction)
-        created_loan_transaction_dto = LoanMapper.map_loan_transaction_to_loan_transaction_read_dto(created_loan_transaction)
+            if already_paid + loan_transaction_create_dto.amount == max_allowed_payment:
+                await self.uow.loan_repository.update_loan_account_status_by_id(
+                    loan_account_id,
+                    LoanAccountStatus.COMPLETED
+                )
+        created_loan_transaction_dto = LoanMapper.map_loan_transaction_to_loan_transaction_read_dto(
+            created_loan_transaction)
         return created_loan_transaction_dto
