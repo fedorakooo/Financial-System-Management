@@ -16,7 +16,7 @@ class DatabaseInitializer:
         await self.create_withdrawals_table()
         await self.create_transfers_table()
         await self.create_loans_table()
-
+        await self.create_deposits_table()
 
     async def create_banks_table(self) -> None:
         create_table = """
@@ -273,7 +273,6 @@ class DatabaseInitializer:
             await conn.execute(create_function)
             await conn.execute(create_trigger)
 
-
     async def create_loans_table(self) -> None:
         create_enum_loan_transaction_type = """
             DO $$ 
@@ -354,3 +353,39 @@ class DatabaseInitializer:
             await conn.execute(create_loan_transactions_table)
             await conn.execute(create_function)
             await conn.execute(create_trigger)
+
+    async def create_deposits_table(self) -> None:
+        create_enum_deposit_transaction_type = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'deposit_transaction_type') THEN
+                    CREATE TYPE deposit_transaction_type AS ENUM ('DEPOSIT', 'WITHDRAWAL');
+                END IF;
+            END $$;
+        """
+
+        create_deposit_accounts_table = """
+            CREATE TABLE IF NOT EXISTS deposit_accounts (
+                id SERIAL PRIMARY KEY,
+                account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                interest_rate DECIMAL(5,2),
+                from_account_id BIGINT NOT NULL REFERENCES accounts(id),
+                user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE
+            );
+        """
+
+        create_deposit_transactions_table = """
+            CREATE TABLE IF NOT EXISTS deposit_transactions (
+                id SERIAL PRIMARY KEY,
+                deposit_account_id BIGINT NOT NULL REFERENCES deposit_accounts(id) ON DELETE CASCADE,
+                account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                type deposit_transaction_type NOT NULL,
+                amount DECIMAL(18 ,2) NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT NOW()
+            );
+        """
+
+        async with self.db_connection as conn:
+            await conn.execute(create_enum_deposit_transaction_type)
+            await conn.execute(create_deposit_accounts_table)
+            await conn.execute(create_deposit_transactions_table)

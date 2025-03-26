@@ -22,12 +22,14 @@ from src.api.routes.client.profile.accounts.operations.addition import router as
 from src.api.routes.client.profile.accounts.operations.withdrawals import router as withdrawal_router
 from src.api.routes.client.profile.accounts.operations.transfer import router as transfer_router
 from src.api.routes.client.profile.accounts.operations.loan import router as loan_router
+from src.api.routes.client.profile.accounts.operations.deposit import router as deposit_router
 
 router = APIRouter(prefix="/accounts", tags=["Accounts"])
 router.include_router(addition_router)
 router.include_router(withdrawal_router)
 router.include_router(transfer_router)
 router.include_router(loan_router)
+router.include_router(deposit_router)
 
 
 @router.get("/{account_id}", response_model=list[AccountResponse], responses={

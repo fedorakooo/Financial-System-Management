@@ -11,6 +11,7 @@ from src.application.services.auth.token import TokenService
 from src.application.services.auth.user import AuthUserService
 from src.application.services.banks.bank_management import BankManagementService
 from src.application.services.banks.bank_public import BankPublicService
+from src.application.services.deposits.deposit_profile import DepositProfileService
 from src.application.services.loans.loan_management import LoanManagementService
 from src.application.services.loans.loan_profile import LoanProfileService
 from src.application.services.logs.log import LogService
@@ -124,4 +125,9 @@ class Services(containers.DeclarativeContainer):
     loan_management_service = providers.Factory(
         LoanManagementService,
         uow=uow.loan_unit_of_work,
+    )
+
+    deposit_profile_service = providers.Factory(
+        DepositProfileService,
+        uow=uow.deposit_unit_of_work,
     )

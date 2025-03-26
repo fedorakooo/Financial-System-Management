@@ -2,6 +2,7 @@ from src.domain.abstractions.database.factories.repository import AbstractReposi
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.domain.abstractions.database.repositories.additions import AbstractAdditionRepository
 from src.domain.abstractions.database.repositories.banks import AbstractBankRepository
+from src.domain.abstractions.database.repositories.deposit import AbstractDepositRepository
 from src.domain.abstractions.database.repositories.loans import AbstractLoanRepository
 from src.domain.abstractions.database.repositories.transfer import AbstractTransferRepository
 from src.domain.abstractions.database.repositories.users import AbstractUserRepository
@@ -9,6 +10,7 @@ from src.domain.abstractions.database.repositories.withdrawals import AbstractWi
 from src.infrastructure.database.repositories.account import AccountRepository
 from src.infrastructure.database.repositories.addition import AdditionRepository
 from src.infrastructure.database.repositories.bank import BankRepository
+from src.infrastructure.database.repositories.deposit import DepositRepository
 from src.infrastructure.database.repositories.loan import LoanRepository
 from src.infrastructure.database.repositories.transfer import TransferRepository
 from src.infrastructure.database.repositories.user import UserRepository
@@ -36,3 +38,6 @@ class RepositoryFactory(AbstractRepositoryFactory):
 
     def create_loan_repository(self, connection) -> AbstractLoanRepository:
         return LoanRepository(connection)
+
+    def create_deposit_repository(self, connection) -> AbstractDepositRepository:
+        return DepositRepository(connection)
