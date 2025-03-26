@@ -5,7 +5,6 @@ from src.api.security import get_current_active_auth_user
 from src.application.abstractions.loans.loan_management import AbstractLoanManagementService
 from src.application.abstractions.logs.log import AbstractLogService
 from src.application.dtos.user import UserAccessDTO
-from src.application.mappers.loan import LoanMapper
 from src.infrastructure.dependencies.app import Application
 from src.infrastructure.mappers.loan import LoanSchemaMapper
 

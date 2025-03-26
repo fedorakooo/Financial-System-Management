@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 from src.domain.entities.loan import Loan, LoanTransaction, LoanAccount
-from src.domain.enums.loan import LoanAccountStatus
 
 
 class AbstractLoanRepository(ABC):
@@ -24,6 +23,9 @@ class AbstractLoanRepository(ABC):
         """
         pass
 
+    async def get_loan_account_by_account_id(self, account_id: int) -> LoanAccount:
+        pass
+
     @abstractmethod
     async def get_loan_accounts_by_user_id(self, user_id: int) -> list[LoanAccount]:
         """Fetches loan accounts associated with a specific user."""
@@ -37,10 +39,6 @@ class AbstractLoanRepository(ABC):
         pass
 
     async def create_loan_transaction(self, loan_transaction: LoanTransaction) -> LoanTransaction:
-        pass
-
-    @abstractmethod
-    async def update_loan_account_status_by_id(self, loan_account_id: int, loan_status: LoanAccountStatus) -> LoanAccount:
         pass
 
     async def create_loan_account(self, loan_account_create: LoanAccount):

@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from src.application.dtos.account import AccountReadDTO
-from src.domain.enums.loan import LoanTermMonths, LoanAccountStatus, LoanTransactionType
+from src.domain.enums.loan import LoanTermMonths, LoanTransactionType
 
 
 @dataclass(frozen=True)
@@ -28,7 +28,6 @@ class LoanAccountReadDTO:
     account_id: int
     account: AccountReadDTO
     loan_id: int
-    status: LoanAccountStatus
     loan: LoanReadDTO
     user_id: int
     id: int

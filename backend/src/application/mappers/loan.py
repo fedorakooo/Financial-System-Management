@@ -57,7 +57,6 @@ class LoanMapper:
             account=account,
             loan_id=loan_account.loan_id,
             loan=loan,
-            status=loan_account.status,
             user_id=loan_account.user_id
         )
 
@@ -67,7 +66,7 @@ class LoanMapper:
     ) -> LoanTransactionReadDTO:
         return LoanTransactionReadDTO(
             loan_account_id=loan_transaction.loan_account_id,
-            type=loan_transaction.loan_account_id,
+            type=loan_transaction.type,
             amount=loan_transaction.amount,
             id=loan_transaction.id,
             created_at=loan_transaction.created_at

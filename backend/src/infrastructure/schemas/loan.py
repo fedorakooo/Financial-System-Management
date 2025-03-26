@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from pydantic import BaseModel
 
-from src.domain.enums.loan import LoanTermMonths, LoanAccountStatus, LoanTransactionType
+from src.domain.enums.loan import LoanTermMonths, LoanTransactionType
 from src.infrastructure.schemas.account import AccountResponse
 
 
@@ -26,7 +26,6 @@ class LoanAccountResponse(BaseModel):
     account: AccountResponse
     loan_id: int
     loan: LoanResponse
-    status: LoanAccountStatus
     user_id: int
     id: int
 

@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from src.domain.enums.loan import LoanTermMonths, LoanAccountStatus, LoanTransactionType
+from src.domain.enums.loan import LoanTermMonths, LoanTransactionType
 
 
 @dataclass(frozen=True)
@@ -21,9 +21,7 @@ class LoanAccount:
     account_id: int
     loan_id: int
     user_id: int
-    status: Optional[LoanAccountStatus] = LoanAccountStatus.PENDING
     id: Optional[int] = None
-
 
 
 @dataclass(frozen=True)

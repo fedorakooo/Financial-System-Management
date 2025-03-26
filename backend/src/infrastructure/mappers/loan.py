@@ -1,4 +1,5 @@
-from src.application.dtos.loan import LoanReadDTO, LoanCreateDTO, LoanTransactionReadDTO, LoanAccountReadDTO
+from src.application.dtos.loan import LoanReadDTO, LoanCreateDTO, LoanTransactionReadDTO, LoanAccountReadDTO, \
+    LoanTransactionCreateDTO
 from src.infrastructure.mappers.account import AccountSchemaMapper
 from src.infrastructure.schemas.loan import (
     LoanResponse,
@@ -31,7 +32,6 @@ class LoanSchemaMapper:
             account=account_response,
             loan_id=dto.loan_id,
             user_id=dto.user_id,
-            status=dto.status,
             loan=loan_response,
             id=dto.id
         )
@@ -55,7 +55,11 @@ class LoanSchemaMapper:
         )
 
     @staticmethod
-    def map_loan_transaction_from_create_request(request: LoanTransactionCreateRequest) -> LoanTransactionCreateRequest:
-       return LoanTransactionCreateRequest(
+    def map_loan_transaction_from_create_request(
+            request: LoanTransactionCreateRequest,
+            loan_account_id: int
+    ) -> LoanTransactionCreateRequest:
+       return LoanTransactionCreateDTO(
            amount=request.amount,
+           loan_account_id=loan_account_id
        )
