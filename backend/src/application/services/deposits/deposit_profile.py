@@ -42,7 +42,8 @@ class DepositProfileService(AbstractDepositProfileService):
         account_create = AccountMapper.map_account_create_dto_to_account(
             account_create_dto,
             requesting_user.id,
-            AccountType.DEPOSIT
+            AccountType.DEPOSIT,
+            AccountStatus.ON_CONSIDERATION
         )
         async with self.uow as uow:
             created_account = await self.uow.account_repository.create_account(account_create)

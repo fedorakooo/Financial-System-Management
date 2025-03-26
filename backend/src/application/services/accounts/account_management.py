@@ -7,10 +7,7 @@ from src.domain.abstractions.database.uows.account import AbstractAccountUnitOfW
 
 
 class AccountManagementService(AbstractAccountManagementService):
-    def __init__(
-            self,
-            uow: AbstractAccountUnitOfWork
-    ):
+    def __init__(self, uow: AbstractAccountUnitOfWork):
         self.uow = uow
 
     async def get_accounts_by_user_id(self, user_id: int, requesting_user: UserAccessDTO) -> list[AccountReadDTO]:

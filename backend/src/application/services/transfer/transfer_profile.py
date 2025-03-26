@@ -6,6 +6,9 @@ from src.domain.abstractions.database.repositories.accounts import AbstractAccou
 from src.domain.abstractions.database.repositories.transfer import AbstractTransferRepository
 from src.application.services.transfer.access_control import TransferProfileAccessControlService as AccessControl
 from src.domain.abstractions.database.uows.transfer import AbstractTransferUnitOfWork
+from src.domain.enums.account import AccountStatus
+from src.domain.exceptions.account import InactiveAccountError
+from src.infrastructure.exceptions.repository_exceptions import NotFoundError
 
 
 class TransferProfileService(AbstractTransferProfileService):
@@ -23,9 +26,7 @@ class TransferProfileService(AbstractTransferProfileService):
         async with self.uow as uow:
             account = await uow.account_repository.get_account_by_id(account_id)
             AccessControl.can_get_transfers(account.user_id, requesting_user)
-
             transfers = await uow.transfer_repository.get_transfers_by_account_id(account_id)
-
         transfers_dto = [TransferMapper.map_transfer_to_transfer_read_dto(transfer) for transfer in transfers]
         return transfers_dto
 
@@ -37,7 +38,11 @@ class TransferProfileService(AbstractTransferProfileService):
         async with self.uow as uow:
             sender_account = await uow.account_repository.get_account_by_id(transfer_create_dto.from_account_id)
             AccessControl.can_create_transfer(sender_account.user_id, requesting_user)
+            if sender_account.status is not AccountStatus.ACTIVE:
+                raise InactiveAccountError(sender_account.status)
             receive_account = await uow.account_repository.get_account_by_id(transfer_create_dto.to_account_id)
+            if receive_account.status is not AccountStatus.ACTIVE:
+                raise NotFoundError(f"Account with id {receive_account.status} not found")
 
             new_sender_account_balance = sender_account.balance - transfer_create_dto.amount
             new_receiver_account_balance = receive_account.balance + transfer_create_dto.amount

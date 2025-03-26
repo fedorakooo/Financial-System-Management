@@ -4,7 +4,7 @@ from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.account import AccountMapper
 from src.application.services.accounts.access_control import AccountProfileAccessControlService as AccessControl
 from src.domain.abstractions.database.uows.account import AbstractAccountUnitOfWork
-from src.domain.enums.account import AccountType
+from src.domain.enums.account import AccountType, AccountStatus
 
 
 class AccountProfileService(AbstractAccountProfileService):
@@ -34,7 +34,8 @@ class AccountProfileService(AbstractAccountProfileService):
         account_create = AccountMapper.map_account_create_dto_to_account(
             account_create_dto,
             requesting_user.id,
-            AccountType.SETTLEMENT
+            AccountType.SETTLEMENT,
+            AccountStatus.ON_CONSIDERATION
         )
         async with self.uow as uow:
             created_account = await self.uow.account_repository.create_account(account_create)

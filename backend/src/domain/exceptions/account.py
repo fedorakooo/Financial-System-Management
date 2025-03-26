@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from src.domain.enums.account import AccountStatus
+
 
 class AccountError(Exception):
     """Base exception for account handlers."""
@@ -31,4 +33,13 @@ class InsufficientFundsError(AccountError):
         self.current_balance = current_balance
         super().__init__(
             f"Insufficient funds. Current balance: {self.current_balance}"
+        )
+
+class InactiveAccountError(AccountError):
+    """Exception raised when an operation is attempted on an inactive account."""
+
+    def __init__(self, current_status: str):
+        self.current_status = current_status
+        super().__init__(
+            f"Account must be {AccountStatus.ACTIVE} for this operation. Current status: {self.current_status}"
         )

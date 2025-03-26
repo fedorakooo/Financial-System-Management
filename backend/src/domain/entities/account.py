@@ -10,8 +10,8 @@ class Account:
     user_id: int
     bank_id: int
     type: AccountType
+    status: AccountStatus
     id: int = None
     balance: Decimal("0.00") = Decimal("0.00")
-    status: AccountStatus = AccountStatus.ACTIVE
     created_at: datetime = None
     updated_at: datetime = None

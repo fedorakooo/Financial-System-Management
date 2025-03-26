@@ -4,7 +4,8 @@ from src.application.dtos.user import UserAccessDTO
 from src.application.mappers.withdrawal import WithdrawalMapper
 from src.application.services.withdrawals.access_control import WithdrawalProfileAccessControlService as AccessControl
 from src.domain.abstractions.database.uows.withdrawal import AbstractWithdrawalUnitOfWork
-from src.domain.exceptions.account import InsufficientFundsError
+from src.domain.enums.account import AccountStatus
+from src.domain.exceptions.account import InsufficientFundsError, InactiveAccountError
 
 
 class WithdrawalProfileService(AbstractWithdrawalProfileService):
@@ -34,6 +35,9 @@ class WithdrawalProfileService(AbstractWithdrawalProfileService):
         async with self.uow as uow:
             account = await uow.account_repository.get_account_by_id(withdrawal_create_dto.account_id)
             AccessControl.can_create_withdrawal(account.user_id, requesting_user)
+
+            if account.status is not AccountStatus.ACTIVE:
+                raise InactiveAccountError(account.status)
 
             new_account_balance = account.balance - withdrawal_create_dto.amount
             if new_account_balance < 0:

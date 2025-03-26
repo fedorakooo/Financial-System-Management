@@ -6,7 +6,7 @@ from src.application.mappers.loan import LoanMapper
 from src.domain.abstractions.database.uows.loan import AbstractLoanUnitOfWork
 from src.application.services.loans.access_control import LoanProfileAccessControlService as AccessControl
 from src.domain.entities.loan import LoanAccount
-from src.domain.enums.account import AccountType
+from src.domain.enums.account import AccountType, AccountStatus
 from src.domain.enums.loan import LoanTransactionType, LoanAccountStatus
 from src.application.dtos.loan import (
     LoanAccountReadDTO,
@@ -52,7 +52,8 @@ class LoanProfileService(AbstractLoanProfileService):
             account = AccountMapper.map_account_create_dto_to_account(
                 account_create_dto,
                 requesting_user.id,
-                AccountType.LOAN
+                AccountType.LOAN,
+                AccountStatus.ON_CONSIDERATION
             )
             created_loan = await self.uow.loan_repository.create_loan(loan)
             created_account = await self.uow.account_repository.create_account(account)

@@ -2,18 +2,24 @@ from datetime import datetime
 
 from src.application.dtos.account import AccountUpdateClientDTO, AccountCreateDTO, AccountUpdateStaffDTO, AccountReadDTO
 from src.domain.entities.account import Account
-from src.domain.enums.account import AccountType
+from src.domain.enums.account import AccountType, AccountStatus
 
 
 class AccountMapper:
     """Utility class for mapping between Account-related DTOs and domain entities."""
 
     @staticmethod
-    def map_account_create_dto_to_account(dto: AccountCreateDTO, user_id: int, account_type: AccountType) -> Account:
+    def map_account_create_dto_to_account(
+            dto: AccountCreateDTO,
+            user_id: int,
+            account_type: AccountType,
+            account_status: AccountStatus
+    ) -> Account:
         return Account(
             user_id=user_id,
             bank_id=dto.bank_id,
-            type=account_type
+            type=account_type,
+            account_status=account_status
         )
 
     @staticmethod
