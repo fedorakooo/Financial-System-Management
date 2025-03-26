@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from src.domain.entities.transfer import Transfer
+from src.domain.enums.transfer import TransferStatus
 
 
 class AbstractTransferRepository(ABC):
@@ -21,4 +22,8 @@ class AbstractTransferRepository(ABC):
 
     @abstractmethod
     async def create_transfer(self, transfer_create: Transfer) -> Transfer:
+        pass
+
+    @abstractmethod
+    async def update_transfer_status_by_id(self, transfer_id: int, transfer_status: TransferStatus) -> Transfer:
         pass

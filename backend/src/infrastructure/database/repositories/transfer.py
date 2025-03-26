@@ -2,6 +2,7 @@ from typing import Any
 
 from src.domain.abstractions.database.repositories.transfer import AbstractTransferRepository
 from src.domain.entities.transfer import Transfer
+from src.domain.enums.transfer import TransferStatus
 from src.infrastructure.database.mappers.transfer import TransferDatabaseMapper
 from src.infrastructure.exceptions.repository_exceptions import NotFoundError
 
@@ -39,3 +40,14 @@ class TransferRepository(AbstractTransferRepository):
         row = self.connection.fetchrow(stmt, *values)
 
         return TransferDatabaseMapper.from_db_row(row)
+
+    async def update_transfer_status_by_id(
+            self,
+            transfer_id: int,
+            transfer_status: TransferStatus
+    ) -> Transfer:
+        stmt = f"UPDATE transfers SET status = $2 WHERE id = $1 RETURNING *"
+        row = await self.connection.fetchrow(stmt, transfer_id, transfer_status.value)
+        if row:
+            return TransferDatabaseMapper.from_db_row(row)
+        raise NotFoundError(f"Transfer with id = {transfer_id} not found")
