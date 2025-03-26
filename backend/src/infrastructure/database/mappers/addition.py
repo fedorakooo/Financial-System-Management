@@ -1,5 +1,6 @@
 from src.domain.entities.account import Account
 from src.domain.entities.addition import Addition
+from src.domain.enums.addition import AdditionSource
 
 
 class AdditionDatabaseMapper:
@@ -10,7 +11,7 @@ class AdditionDatabaseMapper:
         return Addition(
             account_id=row["account_id"],
             amount=row["amount"],
-            source=row["source"],
+            source=AdditionSource(row["source"]),
             id=row["id"],
             created_at=row["created_at"]
         )

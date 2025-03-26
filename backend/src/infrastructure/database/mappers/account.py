@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from src.domain.entities.account import Account
-from src.domain.enums.account import AccountStatus
+from src.domain.enums.account import AccountStatus, AccountType
 
 
 class AccountDatabaseMapper:
@@ -14,8 +14,8 @@ class AccountDatabaseMapper:
             bank_id=row["bank_id"],
             id=row.get("id"),
             balance=Decimal(row["balance"]),
-            status=row["status"],
-            type=row["type"],
+            status=AccountStatus(row["status"]),
+            type=AccountType(row["type"]),
             created_at=row["created_at"],
             updated_at=row["updated_at"]
         )

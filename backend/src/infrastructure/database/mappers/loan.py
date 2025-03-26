@@ -1,4 +1,5 @@
 from src.domain.entities.loan import Loan, LoanTransaction, LoanAccount
+from src.domain.enums.loan import LoanTermMonths, LoanTransactionType
 
 
 class LoanDatabaseMapper:
@@ -8,7 +9,7 @@ class LoanDatabaseMapper:
     def from_db_row_to_loan(row: dict) -> Loan:
         return Loan(
             amount=row["amount"],
-            term_months=row["term_months"],
+            term_months=LoanTermMonths(row["term_months"]),
             interest_rate=row["interest_rate"],
             id=row["id"],
             updated_at=row["updated_at"],
@@ -28,7 +29,7 @@ class LoanDatabaseMapper:
         return LoanTransaction(
             loan_account_id=row["loan_account_id"],
             id=row["id"],
-            type=row["type"],
+            type=LoanTransactionType(row["type"]),
             amount=row["amount"],
             created_at=row["created_at"]
         )
@@ -36,7 +37,7 @@ class LoanDatabaseMapper:
     @staticmethod
     def from_loan_transaction_to_db_row(loan: LoanTransaction) -> dict:
         return {
-            "type": loan.type,
+            "type": loan.type.value,
             "loan_account_id": loan.loan_account_id,
             "amount": loan.amount,
         }
@@ -56,5 +57,4 @@ class LoanDatabaseMapper:
             "account_id": loan.account_id,
             "loan_id": loan.loan_id,
             "user_id": loan.user_id,
-            "status": loan.status.value
         }

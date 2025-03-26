@@ -1,18 +1,19 @@
 from src.domain.entities.transfer import Transfer
 from src.domain.entities.account import Account
+from src.domain.enums.transfer import TransferStatus
 
 
 class TransferDatabaseMapper:
     """Utility class for mapping between database rows and Transfer entities."""
 
     @staticmethod
-    def from_db_row(row: dict) -> Account:
+    def from_db_row(row: dict) -> Transfer:
         return Transfer(
             from_account_id=row["from_account_id"],
             to_account_id=row["to_account_id"],
             amount=row["amount"],
             id=row["id"],
-            status=row["status"],
+            status=TransferStatus(["status"]),
             updated_at=row["updated_at"],
             created_at=row["created_at"]
         )

@@ -12,8 +12,8 @@ class BankDatabaseMapper:
             name=row["name"],
             bic=row["bic"],
             address=row["address"],
-            created_at=row["created_at"] if row["created_at"] else None,
-            updated_at=row["updated_at"] if row["updated_at"] else datetime.now()
+            created_at=row["created_at"],
+            updated_at=row["updated_at"]
         )
 
     @staticmethod

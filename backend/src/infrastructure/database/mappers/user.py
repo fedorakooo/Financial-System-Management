@@ -13,7 +13,7 @@ class UserDatabaseMapper:
             passport_number=row["passport_number"],
             phone_number=row["phone_number"],
             email=row["email"],
-            role=UserRole[row["role"].upper()],
+            role=UserRole(row["role"]),
             hashed_password=row["hashed_password"],
             is_active=row["is_active"],
             is_foreign=row["is_foreign"],

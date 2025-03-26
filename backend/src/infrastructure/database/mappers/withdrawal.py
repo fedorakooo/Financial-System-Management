@@ -1,4 +1,5 @@
 from src.domain.entities.withdrawal import Withdrawal
+from src.domain.enums.withdrawal import WithdrawalSource
 
 
 class WithdrawalDatabaseMapper:
@@ -9,7 +10,7 @@ class WithdrawalDatabaseMapper:
         return Withdrawal(
             account_id=row["account_id"],
             amount=row["amount"],
-            source=row["source"],
+            source=WithdrawalSource(row["source"]),
             id=row["id"],
             created_at=row["created_at"]
         )

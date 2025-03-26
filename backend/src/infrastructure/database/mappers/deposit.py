@@ -21,7 +21,8 @@ class DepositDatabaseMapper:
             type=row["type"],
             amount=row["amount"],
             id=row["id"],
-            created_at=row["created_at"]
+            created_at=row["created_at"],
+            account_id=row["account_id"]
         )
 
     @staticmethod
