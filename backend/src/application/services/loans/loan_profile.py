@@ -7,13 +7,15 @@ from src.domain.abstractions.database.uows.loan import AbstractLoanUnitOfWork
 from src.application.services.loans.access_control import LoanProfileAccessControlService as AccessControl
 from src.domain.entities.loan import LoanAccount
 from src.domain.enums.account import AccountType, AccountStatus
-from src.domain.enums.loan import LoanTransactionType, LoanAccountStatus
+from src.domain.enums.loan import LoanTransactionType
 from src.application.dtos.loan import (
     LoanAccountReadDTO,
     LoanCreateDTO,
     LoanTransactionCreateDTO,
     LoanTransactionReadDTO
 )
+from src.domain.exceptions.account import InactiveAccountError, InsufficientFundsError
+from src.domain.exceptions.loan import LoanAccountNonZeroBalanceError
 from src.domain.exceptions.payment import PaymentExceedsLimitError
 
 
@@ -21,13 +23,13 @@ class LoanProfileService(AbstractLoanProfileService):
     def __init__(self, uow: AbstractLoanUnitOfWork):
         self.uow = uow
 
-    async def get_loan_account_by_id(
+    async def get_loan_account_by_account_id(
             self,
-            loan_account_id: int,
+            account_id: int,
             requesting_user: UserAccessDTO
     ) -> list[LoanAccountReadDTO]:
         async with self.uow as uow:
-            loan_account = await self.uow.loan_repository.get_loan_account_by_id(loan_account_id)
+            loan_account = await self.uow.loan_repository.get_loan_account_by_id(account_id)
             account = await self.uow.account_repository.get_account_by_id(loan_account.account_id)
             AccessControl.can_get_loans(account.user_id, requesting_user)
             loan = await self.uow.loan_repository.get_loan_by_id(loan_account.loan_id)
@@ -61,7 +63,6 @@ class LoanProfileService(AbstractLoanProfileService):
                 LoanAccount(
                     account_id=created_account.id,
                     loan_id=created_loan.id,
-                    status=LoanAccountStatus.PENDING,
                     user_id=created_account.user_id
                 )
             )
@@ -80,9 +81,14 @@ class LoanProfileService(AbstractLoanProfileService):
         async with self.uow as uow:
             loan_account = await uow.loan_repository.get_loan_account_by_id(loan_account_id)
             AccessControl.can_create_loan_transaction(loan_account.user_id, requesting_user)
+            account = await self.uow.account_repository.get_account_by_id(loan_account.account_id)
+            if account.status is not AccountStatus.ACTIVE:
+                raise InactiveAccountError(account.status)
+            if account.balance < loan_transaction_create_dto.amount:
+                raise InsufficientFundsError(account.balance)
             loan = await self.uow.loan_repository.get_loan_by_id(loan_account.loan_id)
             max_allowed_payment = loan.amount * loan.interest_rate
-            loan_transactions = await uow.loan_repository.get_loan_transactions_by_loan_account_id(loan_account_id)
+            loan_transactions = await self.uow.loan_repository.get_loan_transactions_by_loan_account_id(loan_account_id)
             already_paid = sum(loan_transaction.amount for loan_transaction in loan_transactions)
             if already_paid + loan_transaction_create_dto.amount > max_allowed_payment:
                 raise PaymentExceedsLimitError(
@@ -95,11 +101,32 @@ class LoanProfileService(AbstractLoanProfileService):
                 LoanTransactionType.PAYMENT
             )
             created_loan_transaction = await self.uow.loan_repository.create_loan_transaction(loan_transaction)
+            await self.uow.account_repository.update_account_balance(
+                account.id,
+                account.balance - created_loan_transaction.amount
+            )
             if already_paid + loan_transaction_create_dto.amount == max_allowed_payment:
-                await self.uow.loan_repository.update_loan_account_status_by_id(
-                    loan_account_id,
-                    LoanAccountStatus.COMPLETED
-                )
+                if account.balance == 0:
+                    await self.uow.account_repository.update_account_status(account.id, AccountStatus.BLOCKED)
+                else:
+                    raise LoanAccountNonZeroBalanceError(account.balance)
         created_loan_transaction_dto = LoanMapper.map_loan_transaction_to_loan_transaction_read_dto(
-            created_loan_transaction)
+            created_loan_transaction
+        )
         return created_loan_transaction_dto
+
+
+    async def get_loan_transactions_by_loan_account_id(
+            self,
+            loan_account_id: int,
+            requesting_user: UserAccessDTO
+    ) -> list[LoanTransactionReadDTO]:
+        async with self.uow as uow:
+            loan_account = await self.uow.loan_repository.get_loan_account_by_id(loan_account_id)
+            AccessControl.can_get_loan_transactions(loan_account.user_id, requesting_user)
+            loan_transactions = await self.uow.loan_repository.get_loan_transactions_by_loan_account_id(loan_account_id)
+
+        loan_transactions_dto = [
+            LoanMapper.map_loan_transaction_to_loan_transaction_read_dto(loan_transaction) for loan_transaction in loan_transactions
+        ]
+        return loan_transactions_dto

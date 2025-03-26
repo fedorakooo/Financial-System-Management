@@ -18,10 +18,10 @@ from src.infrastructure.schemas.loan import LoanAccountResponse, LoanResponse, L
 router = APIRouter(prefix="/loan_accounts", tags=["Loans"])
 
 
-@router.get("/{loan_account_id}", response_model=LoanAccountResponse)
+@router.get("/{account_id}", response_model=LoanAccountResponse)
 @inject
-async def get_loan_account_by_id(
-        loan_account_id: int,
+async def get_loan_account_by_account_id(
+        account_id: int,
         requesting_user: UserAccessDTO = Depends(get_current_active_auth_user),
         loan_profile_service: AbstractLoanProfileService = Depends(
             Provide[Application.services.loan_profile_service]
@@ -30,10 +30,10 @@ async def get_loan_account_by_id(
 ) -> LoanAccountResponse:
     try:
         log_service.info(
-            f"User ID {requesting_user.id} ({requesting_user.role}) is fetching loan account with ID {loan_account_id}"
+            f"User ID {requesting_user.id} ({requesting_user.role}) is fetching loan account with account ID {account_id}"
         )
-        fetched_loan_account_dto = await loan_profile_service.get_loan_account_by_id(
-            loan_account_id,
+        fetched_loan_account_dto = await loan_profile_service.get_loan_account_by_account_id(
+            account_id,
             requesting_user
         )
         log_service.info(f"Successfully fetched transfers for User ID {requesting_user.id} ({requesting_user.role})")
@@ -92,7 +92,6 @@ async def create_loan_request(
         log_service.error(
             f"User ID {requesting_user.id} ({requesting_user.role}) encountered an unexpected error while creating loan request: {str(exc)}"
         )
-        raise exc
         raise HttpExceptionFactory.create_http_exception(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             "An unexpected error occurred while creating loan request."
@@ -112,7 +111,10 @@ async def create_loan_transaction(
         log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
 ) -> LoanTransactionResponse:
     log_service.info(f"User ID {requesting_user.id} ({requesting_user.role}) is attempting to create loan transaction")
-    loan_transaction_create_dto = LoanSchemaMapper.map_loan_transaction_from_create_request(loan_transaction_create_request)
+    loan_transaction_create_dto = LoanSchemaMapper.map_loan_transaction_from_create_request(
+        loan_transaction_create_request,
+        loan_account_id
+    )
     try:
         created_loan_transaction_dto = await loan_profile_service.create_loan_transaction(
             loan_account_id,
@@ -128,6 +130,7 @@ async def create_loan_transaction(
         )
         raise HttpExceptionFactory.create_http_exception(status.HTTP_404_NOT_FOUND, str(exc))
     except ForbiddenError as exc:
+        raise exc
         log_service.error(
             f"User ID {requesting_user.id} ({requesting_user.role}) encountered a ForbiddenError while creating loan transaction request: {str(exc)}"
         )
@@ -136,9 +139,33 @@ async def create_loan_transaction(
         log_service.error(
             f"User ID {requesting_user.id} ({requesting_user.role}) encountered an unexpected error while creating loan transaction: {str(exc)}"
         )
+        raise exc
         raise HttpExceptionFactory.create_http_exception(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             "An unexpected error occurred while creating loan transaction."
         )
     created_loan_transaction = LoanSchemaMapper.map_loan_transaction_to_response(created_loan_transaction_dto)
     return created_loan_transaction
+
+
+@router.get("/{loan_account_id}/transactions", response_model=list[LoanTransactionResponse])
+@inject
+async def get_loan_transactions_by_loan_account_id(
+        loan_account_id: int,
+        requesting_user: UserAccessDTO = Depends(get_current_active_auth_user),
+        loan_profile_service: AbstractLoanProfileService = Depends(
+            Provide[Application.services.loan_profile_service]
+        ),
+        log_service: AbstractLogService = Depends(Provide[Application.services.log_service])
+) -> list[LoanTransactionResponse]:
+    try:
+        loan_transactions_dto = await loan_profile_service.get_loan_transactions_by_loan_account_id(
+            loan_account_id,
+            requesting_user
+        )
+    except Exception as exc:
+        raise exc
+    loan_transactions = [
+        LoanSchemaMapper.map_loan_transaction_to_response(loan_transaction_dto) for loan_transaction_dto in loan_transactions_dto
+    ]
+    return loan_transactions

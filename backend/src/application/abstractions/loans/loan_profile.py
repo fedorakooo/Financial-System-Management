@@ -15,9 +15,9 @@ class AbstractLoanProfileService(ABC):
     """Abstract service for managing user loans."""
 
     @abstractmethod
-    async def get_loan_account_by_id(
+    async def get_loan_account_by_account_id(
             self,
-            loan_account_id: int,
+            account_id: int,
             requesting_user: UserAccessDTO
     ) -> list[LoanAccountReadDTO]:
         pass
@@ -38,4 +38,12 @@ class AbstractLoanProfileService(ABC):
             loan_transaction: LoanTransactionCreateDTO,
             requesting_user: UserAccessDTO
     ) -> LoanTransactionReadDTO:
+        pass
+
+    @abstractmethod
+    async def get_loan_transactions_by_loan_account_id(
+            self,
+            loan_account_id: int,
+            requesting_user: UserAccessDTO
+    ) -> list[LoanTransactionReadDTO]:
         pass
