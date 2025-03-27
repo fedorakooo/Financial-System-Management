@@ -1,22 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
-from src.domain.abstractions.database.connection import AbstractDatabaseConnection
-from src.domain.abstractions.database.factories.repository import AbstractRepositoryFactory
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.domain.abstractions.database.repositories.transfer import AbstractTransferRepository
+from src.domain.abstractions.database.uows.uow import AbstractUnitOfWork
 
 
-class AbstractTransferUnitOfWork(ABC):
-    @abstractmethod
-    async def __aenter__(self):
-        """Set up the context manager by establishing a connection and starting a transaction."""
-        pass
-
-    @abstractmethod
-    async def __aexit__(self, exc_type, exc, tb):
-        """Clean up by committing or rolling back the transaction and closing the connection."""
-        pass
-
+class AbstractTransferUnitOfWork(AbstractUnitOfWork):
     @property
     @abstractmethod
     def account_repository(self) -> AbstractAccountRepository:

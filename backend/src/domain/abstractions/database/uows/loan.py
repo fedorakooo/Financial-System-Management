@@ -1,20 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from src.domain.abstractions.database.repositories.accounts import AbstractAccountRepository
 from src.domain.abstractions.database.repositories.loans import AbstractLoanRepository
+from src.domain.abstractions.database.uows.uow import AbstractUnitOfWork
 
 
-class AbstractLoanUnitOfWork(ABC):
-    @abstractmethod
-    async def __aenter__(self):
-        """Set up the context manager by establishing a connection and starting a transaction."""
-        pass
-
-    @abstractmethod
-    async def __aexit__(self, exc_type, exc, tb):
-        """Clean up by committing or rolling back the transaction and closing the connection."""
-        pass
-
+class AbstractLoanUnitOfWork(AbstractUnitOfWork):
     @property
     @abstractmethod
     def loan_repository(self) -> AbstractLoanRepository:
