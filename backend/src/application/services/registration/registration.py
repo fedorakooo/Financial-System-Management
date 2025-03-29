@@ -43,3 +43,6 @@ class UserRegistrationService(AbstractUserRegistrationService):
 
     async def create_user_admin(self, user_create_dto: UserCreateDTO) -> UserReadDTO:
         return await self._create_user(user_create_dto, UserRole.ADMINISTRATOR)
+
+    async def create_user_specialist(self, user_create_dto: UserCreateDTO) -> UserReadDTO:
+        return await self._create_user(user_create_dto, UserRole.SPECIALIST)

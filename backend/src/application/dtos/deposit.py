@@ -31,7 +31,7 @@ class DepositTransactionReadDTO:
     account_id: int
     type: DepositTransactionType
     amount: Decimal("0.00")
-    created_at: Optional[datetime] = None
+    created_at: datetime
 
 @dataclass(frozen=True)
 class DepositTransactionCreateClientDTO:

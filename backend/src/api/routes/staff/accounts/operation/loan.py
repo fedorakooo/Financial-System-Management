@@ -7,7 +7,7 @@ from src.application.abstractions.logs.log import AbstractLogService
 from src.application.dtos.user import UserAccessDTO
 from src.infrastructure.dependencies.app import Application
 from src.infrastructure.mappers.loan import LoanSchemaMapper
-
+from src.infrastructure.schemas.loan import LoanAccountResponse
 router = APIRouter(prefix="/loans")
 
 
@@ -22,7 +22,7 @@ async def approve_loan_account(
         log_service: AbstractLogService = Depends(
             Provide[Application.services.log_service]
         )
-):
+) -> LoanAccountResponse:
     approved_loan_account_dto = await loan_management_service.approve_loan_account_request(loan_account_id, requesting_user)
     approved_loan_account = LoanSchemaMapper.map_loan_account_to_response(approved_loan_account_dto)
     return approved_loan_account

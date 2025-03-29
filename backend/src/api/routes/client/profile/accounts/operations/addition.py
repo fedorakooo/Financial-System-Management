@@ -103,7 +103,6 @@ async def create_addition(
         )
         raise HttpExceptionFactory.create_http_exception(status.HTTP_403_FORBIDDEN, str(exc))
     except Exception as exc:
-        raise exc
         log_service.error(
             f"User ID {requesting_user.id} ({requesting_user.role}) encountered an unexpected error while creating addition: {str(exc)}"
         )

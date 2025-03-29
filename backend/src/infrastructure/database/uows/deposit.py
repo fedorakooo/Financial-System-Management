@@ -45,7 +45,7 @@ class DepositUnitOfWork(AbstractDepositUnitOfWork):
         return self._account_repository
 
     @property
-    def deposit_repository(self) -> AbstractLoanRepository:
+    def deposit_repository(self) -> AbstractDepositRepository:
         """Return the deposit repository."""
         if self._deposit_repository is None:
             raise RuntimeError("Deposit repository is not initialized. Use the context manager.")

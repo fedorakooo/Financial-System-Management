@@ -15,6 +15,9 @@ class AbstractUserRepository(ABC):
         """
         pass
 
+    async def get_user_by_passport_number(self, passport_number: str) -> User:
+        pass
+
     @abstractmethod
     async def get_user_by_phone_number(self, phone_number: str) -> User:
         """Fetches a user by their phone number.

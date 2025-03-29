@@ -25,3 +25,8 @@ class AbstractUserRegistrationService(ABC):
     async def create_user_admin(self, user_create_dto: UserCreateDTO) -> UserReadDTO:
         """Creates a new user with the 'ADMINISTRATOR' role."""
         pass
+
+    @abstractmethod
+    async def create_user_specialist(self, user_create_dto: UserCreateDTO) -> UserReadDTO:
+        """Creates a new user with the 'SPECIALIST' role."""
+        pass

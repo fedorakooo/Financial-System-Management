@@ -4,6 +4,7 @@ from src.domain.abstractions.database.repositories.accounts import AbstractAccou
 from src.domain.abstractions.database.repositories.additions import AbstractAdditionRepository
 from src.domain.abstractions.database.repositories.banks import AbstractBankRepository
 from src.domain.abstractions.database.repositories.deposit import AbstractDepositRepository
+from src.domain.abstractions.database.repositories.enterprise import AbstractEnterpriseRepository
 from src.domain.abstractions.database.repositories.loans import AbstractLoanRepository
 from src.domain.abstractions.database.repositories.transfer import AbstractTransferRepository
 from src.domain.abstractions.database.repositories.users import AbstractUserRepository
@@ -41,4 +42,8 @@ class AbstractRepositoryFactory(ABC):
 
     @abstractmethod
     def create_deposit_repository(self, connection) -> AbstractDepositRepository:
+        pass
+
+    @abstractmethod
+    def create_enterprise_repository(self, connection) -> AbstractEnterpriseRepository:
         pass
