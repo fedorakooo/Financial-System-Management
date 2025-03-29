@@ -12,14 +12,18 @@ from src.application.services.auth.user import AuthUserService
 from src.application.services.banks.bank_management import BankManagementService
 from src.application.services.banks.bank_public import BankPublicService
 from src.application.services.deposits.deposit_profile import DepositProfileService
+from src.application.services.enterprises.enterprise_management import EnterpriseManagementService
+from src.application.services.enterprises.enterprise_specialist import EnterpriseSpecialistService
 from src.application.services.loans.loan_management import LoanManagementService
 from src.application.services.loans.loan_profile import LoanProfileService
 from src.application.services.logs.log import LogService
 from src.application.services.profile.profile import ProfileService
 from src.application.services.registration.registration import UserRegistrationService
+from src.application.services.transfer.transfer_management import TransferManagementService
 from src.application.services.transfer.transfer_profile import TransferProfileService
 from src.application.services.users.user_management import UserManagementService
 from src.application.services.withdrawals.withdrawal_profile import WithdrawalProfileService
+from src.domain.entities.enterprise import EnterpriseSpecialist
 
 
 class Services(containers.DeclarativeContainer):
@@ -130,4 +134,19 @@ class Services(containers.DeclarativeContainer):
     deposit_profile_service = providers.Factory(
         DepositProfileService,
         uow=uow.deposit_unit_of_work,
+    )
+
+    transfer_management_service = providers.Factory(
+        TransferManagementService,
+        uow=uow.transfer_unit_of_work,
+    )
+
+    enterprise_management_service = providers.Factory(
+        EnterpriseManagementService,
+        uow=uow.enterprise_unit_of_work
+    )
+
+    enterprise_specialist_service = providers.Factory(
+        EnterpriseSpecialistService,
+        uow=uow.enterprise_unit_of_work
     )
