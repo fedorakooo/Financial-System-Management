@@ -8,10 +8,21 @@ const Login = lazy(() => import("./components/general/login/Login"));
 const Registration = lazy(() => import("./components/general/registration/Registration"));
 const Profile = lazy(() => import("./components/profile/Profile"));
 const Accounts = lazy(() => import("./components/client/Account"));
-const Additions = lazy(() => import("./components/client/general/Addition"));
-const Loans = lazy(() => import("./components/client/general/Loan"));
-const Transfers = lazy(() => import("./components/client/general/Transfer"));
-const CreateLoan = lazy(() => import("./components/client/general/LoanCreate"));
+const AccountDetails = lazy(() => import("./components/client/AccountDetail"));
+const Additions = lazy(() => import("./components/client/operations/Addition"));
+const Loans = lazy(() => import("./components/client/operations/Loan"));
+const Transfers = lazy(() => import("./components/client/operations/Transfer"));
+const CreateLoan = lazy(() => import("./components/client/operations/LoanCreate"));
+const Withdrawals = lazy(() => import("./components/client/operations/Withdrawal"));
+const LoanTransactions = lazy(() => import("./components/client/operations/LoanTransaction"));
+const GetDepositAccount = lazy(() => import("./components/client/operations/getDepositAccount"));
+const CreateDepositAccount = lazy(() => import("./components/client/operations/createDepositAccount"));
+const EnterpriseSpecialistProfile = lazy(() => import("./components/client/operations/EnterpriseSpecialistProfile"));
+const ApproveLoan = lazy(() => import("./components/client/operations/ApproveLoan"));
+const TransferDetails = lazy(() => import("./components/client/operations/TransferDetailStaff"));
+const AccountList = lazy(() => import("./components/client/operations/StaffAccountList"));
+const GetEnterprise = lazy(() => import("./components/client/operations/GetEnterprisesStaff"));
+const CreateEnterprise = lazy(() => import("./components/client/operations/CreateEnterprise"));
 
 const Home = () => (
   <div className="p-4">
@@ -40,10 +51,22 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/accounts/additions" element={<Additions />} />
             <Route path="/profile/accounts/loan_accounts/:loanAccountId" element={<Loans />} />
-            <Route path="/profile/accounts/loan_accounts/:loanAccountId/transactions" element={<Loans />} />
+            <Route path="/profile/accounts/loan_accounts/:loanAccountId/transactions" element={<LoanTransactions />} />
             <Route path="/profile/accounts/loan_accounts/" element={<CreateLoan />} />
             <Route path="/profile/accounts/transfers/" element={<Transfers />} />
+            <Route path="/profile/accounts/withdrawals/" element={<Withdrawals />} />
             <Route path="/profile/accounts" element={<Accounts />} />
+            <Route path="/profile/accounts/:accountId" element={<AccountDetails />} />
+            <Route path="/profile/accounts/deposit_accounts/:depositAccountId" element={<GetDepositAccount />} />
+            <Route path="/profile/accounts/deposit_accounts/" element={<CreateDepositAccount />} />
+            <Route path="/enterprises/specialists/profile/" element={<EnterpriseSpecialistProfile />} />
+            <Route path="/staff/accounts/loans/:loanAccountID/" element={<ApproveLoan />} />
+            <Route path="/staff/accounts/transfers/:transferID" element={<TransferDetails />} />
+            <Route path="/staff/accounts/" element={<AccountList />} />
+            <Route path="/staff/enterprises/:enterpriseID" element={<GetEnterprise />} />
+            <Route path="/staff/enterprises/" element={<CreateEnterprise />} />
+
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

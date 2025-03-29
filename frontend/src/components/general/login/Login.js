@@ -118,7 +118,7 @@ const Login = () => {
         <form onSubmit={handleSubmit}>
           <div>
             <label htmlFor="username" style={labelStyle}>
-              Username
+              Phone number
             </label>
             <input
               type="text"
