@@ -35,10 +35,10 @@ class TransferRepository(AbstractTransferRepository):
         placeholders = ', '.join([f"${i + 1}" for i in range(len(transfer_create_row))])
         values = tuple(transfer_create_row.values())
 
-        stmt = f"INSERT INTO additions ({columns}) VALUES ({placeholders}) RETURNING *"
+        stmt = f"INSERT INTO transfers ({columns}) VALUES ({placeholders}) RETURNING *"
 
-        row = self.connection.fetchrow(stmt, *values)
-
+        row = await self.connection.fetchrow(stmt, *values)
+        print(row["status"])
         return TransferDatabaseMapper.from_db_row(row)
 
     async def update_transfer_status_by_id(

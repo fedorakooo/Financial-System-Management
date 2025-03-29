@@ -11,9 +11,11 @@ from src.infrastructure.exceptions.repository_exceptions import UniqueConstraint
 from src.infrastructure.schemas.account import AccountResponse, AccountCreateRequest
 
 from src.api.routes.staff.accounts.operation.loan import router as loan_router
+from src.api.routes.staff.accounts.operation.transfer import router as transfer_router
 
 router = APIRouter(prefix="/accounts", tags=["Accounts Management"])
 router.include_router(loan_router)
+router.include_router(transfer_router)
 
 
 @router.get("/", response_model=list[AccountResponse], responses={

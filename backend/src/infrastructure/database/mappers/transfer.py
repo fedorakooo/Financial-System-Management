@@ -1,5 +1,4 @@
 from src.domain.entities.transfer import Transfer
-from src.domain.entities.account import Account
 from src.domain.enums.transfer import TransferStatus
 
 
@@ -13,7 +12,7 @@ class TransferDatabaseMapper:
             to_account_id=row["to_account_id"],
             amount=row["amount"],
             id=row["id"],
-            status=TransferStatus(["status"]),
+            status=TransferStatus(row["status"]),
             updated_at=row["updated_at"],
             created_at=row["created_at"]
         )

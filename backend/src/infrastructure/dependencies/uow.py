@@ -4,6 +4,7 @@ from src.infrastructure.database.uows.account import AccountUnitOfWork
 from src.infrastructure.database.uows.addition import AdditionUnitOfWork
 from src.infrastructure.database.uows.bank import BankUnitOfWork
 from src.infrastructure.database.uows.deposit import DepositUnitOfWork
+from src.infrastructure.database.uows.enterprise import EnterpriseUnitOfWork
 from src.infrastructure.database.uows.loan import LoanUnitOfWork
 from src.infrastructure.database.uows.transfer import TransferUnitOfWork
 from src.infrastructure.database.uows.user import UserUnitOfWork
@@ -57,6 +58,12 @@ class UnitOfWork(containers.DeclarativeContainer):
 
     deposit_unit_of_work = providers.Factory(
         DepositUnitOfWork,
+        db_connection=gateways.database_connection,
+        repository_factory=gateways.repository_factory,
+    )
+
+    enterprise_unit_of_work = providers.Factory(
+        EnterpriseUnitOfWork,
         db_connection=gateways.database_connection,
         repository_factory=gateways.repository_factory,
     )

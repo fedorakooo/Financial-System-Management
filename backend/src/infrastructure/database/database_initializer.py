@@ -17,6 +17,7 @@ class DatabaseInitializer:
         await self.create_transfers_table()
         await self.create_loans_table()
         await self.create_deposits_table()
+        await self.create_enterprise_tables()
 
     async def create_banks_table(self) -> None:
         create_table = """
@@ -128,7 +129,7 @@ class DatabaseInitializer:
             DO $$ 
             BEGIN
                 IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account_type') THEN
-                    CREATE TYPE account_type AS ENUM ('SALARY', 'DEPOSIT', 'LOAN', 'SETTLEMENT');
+                    CREATE TYPE account_type AS ENUM ('SALARY', 'DEPOSIT', 'LOAN', 'SETTLEMENT', 'ENTERPRISE');
                 END IF;
             END $$;
         """
@@ -378,3 +379,73 @@ class DatabaseInitializer:
             await conn.execute(create_enum_deposit_transaction_type)
             await conn.execute(create_deposit_accounts_table)
             await conn.execute(create_deposit_transactions_table)
+
+    async def create_enterprise_tables(self) -> None:
+        create_enum_enterprise_type = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enterprise_type') THEN
+                    CREATE TYPE enterprise_type AS ENUM ('LLC', 'SP', 'LLP');
+                END IF;
+            END $$;
+        """
+
+        create_enum_payroll_request_status = """
+            DO $$ 
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enterprise_payroll_request_status') THEN
+                    CREATE TYPE enterprise_payroll_request_status AS ENUM ('ON_CONSIDERATION', 'CANCELLED', 'APPROVED');
+                END IF;
+            END $$;
+        """
+
+        create_enterprise_table = """
+            CREATE TABLE IF NOT EXISTS enterprises (
+                id BIGSERIAL PRIMARY KEY,
+                name VARCHAR NOT NULL,
+                type enterprise_type NOT NULL,
+                unp VARCHAR NOT NULL,
+                bank_id BIGINT NOT NULL REFERENCES banks(id) ON DELETE CASCADE,
+                address VARCHAR NOT NULL,
+                account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            );
+        """
+
+        create_enterprise_specialists_table = """
+            CREATE TABLE IF NOT EXISTS enterprise_specialists (
+                id BIGSERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                enterprise_id BIGINT NOT NULL REFERENCES enterprises(id) ON DELETE CASCADE
+            );
+        """
+
+        create_enterprise_payroll_requests_table = """
+            CREATE TABLE IF NOT EXISTS enterprise_payroll_requests (
+                id BIGSERIAL PRIMARY KEY,
+                status enterprise_payroll_request_status NOT NULL,
+                passport_numbers TEXT[] NOT NULL,
+                accounts_id BIGINT[] NOT NULL,
+                enterprise_id BIGINT NOT NULL REFERENCES enterprises(id) ON DELETE CASCADE,
+                specialist_id BIGINT NOT NULL REFERENCES enterprise_specialists(id) ON DELETE CASCADE,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            );
+        """
+
+        create_enterprise_payroll_transactions_table = """
+            CREATE TABLE IF NOT EXISTS enterprise_payroll_transactions (
+                id BIGSERIAL PRIMARY KEY,
+                enterprise_payroll_request_id BIGINT NOT NULL REFERENCES enterprise_payroll_requests(id) ON DELETE CASCADE,
+                created_at TIMESTAMP DEFAULT NOW()
+            );
+        """
+
+        async with self.db_connection as conn:
+            await conn.execute(create_enum_enterprise_type)
+            await conn.execute(create_enum_payroll_request_status)
+            await conn.execute(create_enterprise_table)
+            await conn.execute(create_enterprise_specialists_table)
+            await conn.execute(create_enterprise_payroll_requests_table)
+            await conn.execute(create_enterprise_payroll_transactions_table)

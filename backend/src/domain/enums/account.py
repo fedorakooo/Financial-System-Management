@@ -14,3 +14,4 @@ class AccountType(Enum):
     DEPOSIT = "DEPOSIT"
     SETTLEMENT = "SETTLEMENT"
     LOAN = "LOAN"
+    ENTERPRISE = "ENTERPRISE"

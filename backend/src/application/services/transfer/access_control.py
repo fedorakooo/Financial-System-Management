@@ -24,11 +24,20 @@ class TransferManagementAccessControlService:
     """Service for controlling access to transfer management operations."""
 
     @staticmethod
-    def can_reverse_transaction(requesting_user: UserAccessDTO) -> bool:
+    def can_get_transaction(requesting_user: UserAccessDTO) -> bool:
         if UserRole(requesting_user.role) in [
             UserRole.ADMINISTRATOR,
             UserRole.MANAGER,
             UserRole.OPERATOR
+        ]:
+            return True
+        raise ForbiddenError()
+
+    @staticmethod
+    def can_reverse_transaction(requesting_user: UserAccessDTO) -> bool:
+        if UserRole(requesting_user.role) in [
+            UserRole.ADMINISTRATOR,
+            UserRole.MANAGER,
         ]:
             return True
         raise ForbiddenError()
